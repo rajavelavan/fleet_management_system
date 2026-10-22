@@ -91,6 +91,64 @@ services:
     networks:
       - fleet_network
 
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fleet_celery_worker
+    restart: unless-stopped
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["celery", "-A", "app.celery_app.celery_app", "worker", "--loglevel=info"]
+    volumes:
+      - ./backend:/app
+    environment:
+      PROJECT_NAME: "Fleet & Logistics Management System"
+      ENVIRONMENT: "development"
+      DEBUG: "True"
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-fleet_db}
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fleet_network
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fleet_celery_beat
+    restart: unless-stopped
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["celery", "-A", "app.celery_app.celery_app", "beat", "--loglevel=info"]
+    volumes:
+      - ./backend:/app
+    environment:
+      PROJECT_NAME: "Fleet & Logistics Management System"
+      ENVIRONMENT: "development"
+      DEBUG: "True"
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-fleet_db}
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - fleet_network
+
 volumes:
   postgres_data:
     name: fleet_postgres_data
