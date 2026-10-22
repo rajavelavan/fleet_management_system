@@ -41,7 +41,7 @@ lerna-debug.log*
 dist/
 dist-ssr/
 *.local
-
+package-lock.json
 # IDEs
 .idea/
 .vscode/
