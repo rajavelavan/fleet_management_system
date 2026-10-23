@@ -1,14 +1,13 @@
-import React, { useState } from "react";
-import { X, Save, User, AlertCircle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, User, Save, AlertCircle } from "lucide-react";
 import { Driver, DriverCreatePayload } from "../types/fleet";
 
 interface DriverFormProps {
   initialData?: Driver | null;
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: DriverCreatePayload) => Promise<void>;
+  onSubmit: (payload: DriverCreatePayload) => Promise<void>;
   isLoading: boolean;
-  candidateUsers?: Array<{ id: string; email: string }>;
 }
 
 export const DriverForm: React.FC<DriverFormProps> = ({
@@ -17,26 +16,46 @@ export const DriverForm: React.FC<DriverFormProps> = ({
   onClose,
   onSubmit,
   isLoading,
-  candidateUsers = [],
 }) => {
   const [formData, setFormData] = useState<DriverCreatePayload>({
-    user_id: initialData?.user_id || (candidateUsers[0]?.id || ""),
-    license_number: initialData?.license_number || "",
-    license_expiry: initialData?.license_expiry || new Date().toISOString().split("T")[0],
-    phone: initialData?.phone || "",
-    is_active: initialData?.is_active ?? true,
+    user_id: "",
+    license_number: "",
+    phone: "",
+    license_expiry: "",
+    is_active: true,
   });
 
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        user_id: initialData.user_id,
+        license_number: initialData.license_number,
+        phone: initialData.phone,
+        license_expiry: initialData.license_expiry
+          ? initialData.license_expiry.split("T")[0]
+          : "",
+        is_active: initialData.is_active,
+      });
+    } else {
+      setFormData({
+        user_id: "",
+        license_number: "",
+        phone: "",
+        license_expiry: "",
+        is_active: true,
+      });
+    }
+    setError(null);
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!formData.user_id && !initialData) {
-      setError("Please select a user account to associate with this driver");
+    if (!formData.user_id.trim()) {
+      setError("User ID is required to link an existing user account");
       return;
     }
     if (!formData.license_number.trim()) {
@@ -70,19 +89,19 @@ export const DriverForm: React.FC<DriverFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/10 dark:bg-black/20 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between pb-5 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
               <User className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 {initialData ? "Edit Driver Profile" : "Register Driver"}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {initialData
                   ? "Update driver credentials and license info"
                   : "Associate a user account with a certified driver profile"}
@@ -91,7 +110,7 @@ export const DriverForm: React.FC<DriverFormProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -99,7 +118,7 @@ export const DriverForm: React.FC<DriverFormProps> = ({
 
         {/* Error Alert */}
         {error && (
-          <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center space-x-2 text-rose-400 text-sm">
+          <div className="mt-4 p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl flex items-center space-x-2 text-rose-700 dark:text-rose-400 text-sm">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -107,114 +126,100 @@ export const DriverForm: React.FC<DriverFormProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {!initialData && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Linked User Account *
-              </label>
-              {candidateUsers.length > 0 ? (
-                <select
-                  required
-                  value={formData.user_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, user_id: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <option value="">Select a user account...</option>
-                  {candidateUsers.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.email} ({u.id.substring(0, 8)}...)
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  required
-                  placeholder="Paste User UUID here"
-                  value={formData.user_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, user_id: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                />
-              )}
-            </div>
-          )}
-
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              License Number *
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Associated User UUID *
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. DL-9824-X"
+              disabled={!!initialData}
+              placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+              value={formData.user_id}
+              onChange={(e) =>
+                setFormData({ ...formData, user_id: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono disabled:opacity-50"
+            />
+            {!initialData && (
+              <p className="text-[11px] text-slate-400 mt-1">
+                Must be an existing User with DRIVER role created in Auth database.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Commercial Driver License (CDL) *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. DL-CA-998822"
               value={formData.license_number}
               onChange={(e) =>
                 setFormData({ ...formData, license_number: e.target.value })
               }
-              className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase font-mono"
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase font-mono"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                License Expiration Date *
-              </label>
-              <input
-                type="date"
-                required
-                value={formData.license_expiry}
-                onChange={(e) =>
-                  setFormData({ ...formData, license_expiry: e.target.value })
-                }
-                className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Phone Number *
-              </label>
-              <input
-                type="tel"
-                required
-                placeholder="+1-555-0123"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                className="w-full px-3.5 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              Phone Number (Dispatch Contact) *
+            </label>
+            <input
+              type="tel"
+              required
+              placeholder="e.g. +1-555-0199"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
-          <div className="pt-2">
-            <label className="flex items-center space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.is_active}
-                onChange={(e) =>
-                  setFormData({ ...formData, is_active: e.target.checked })
-                }
-                className="w-4 h-4 rounded text-indigo-600 bg-slate-800 border-slate-700 focus:ring-indigo-500"
-              />
-              <span className="text-sm text-slate-300 font-medium">
-                Active & Certified for Dispatch
-              </span>
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              License Expiration Date *
+            </label>
+            <input
+              type="date"
+              required
+              value={formData.license_expiry}
+              onChange={(e) =>
+                setFormData({ ...formData, license_expiry: e.target.value })
+              }
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2.5 pt-2">
+            <input
+              type="checkbox"
+              id="is_active"
+              checked={formData.is_active}
+              onChange={(e) =>
+                setFormData({ ...formData, is_active: e.target.checked })
+              }
+              className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700"
+            />
+            <label
+              htmlFor="is_active"
+              className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none"
+            >
+              Driver is active and available for dispatch assignments
             </label>
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-5 border-t border-slate-800 flex items-center justify-end space-x-3">
+          <div className="pt-4 flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-sm font-semibold hover:bg-slate-800 transition-colors"
+              className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               Cancel
             </button>
@@ -228,7 +233,7 @@ export const DriverForm: React.FC<DriverFormProps> = ({
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              <span>{initialData ? "Save Changes" : "Create Driver"}</span>
+              <span>{initialData ? "Save Changes" : "Register Driver"}</span>
             </button>
           </div>
         </form>
