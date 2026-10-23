@@ -2,7 +2,7 @@ import json
 import logging
 import uuid
 from datetime import UTC, datetime
-from typing import list, Optional, tuple
+from typing import Optional
 
 import redis.asyncio as aioredis
 from geoalchemy2.functions import ST_Covers, ST_GeogFromText
