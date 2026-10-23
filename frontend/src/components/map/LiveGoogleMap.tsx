@@ -11,6 +11,7 @@ import { TruckMarker } from "./TruckMarker";
 import { RoutePolyline } from "./RoutePolyline";
 import { MapPolygon } from "./MapPolygon";
 import { MapPin, Shield } from "lucide-react";
+import { useThemeStore } from "../../store/themeStore";
 
 // Google Maps Night / Dark Mode Style configuration
 const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
@@ -201,10 +202,12 @@ const FallbackCanvasMap: React.FC<FallbackCanvasMapProps> = ({
     onMapClick({ lat, lng });
   };
 
+  const { resolvedTheme } = useThemeStore();
+
   return (
     <div
       onClick={handleCanvasClick}
-      className={`relative w-full h-full bg-slate-950 overflow-hidden select-none ${
+      className={`relative w-full h-full bg-slate-100 dark:bg-slate-950 overflow-hidden select-none transition-colors duration-200 ${
         isDrawingMode ? "cursor-crosshair" : ""
       }`}
     >
@@ -213,7 +216,9 @@ const FallbackCanvasMap: React.FC<FallbackCanvasMapProps> = ({
         className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(#6366f1 1px, transparent 1px), radial-gradient(#6366f1 1px, #020617 1px)",
+            resolvedTheme === "dark"
+              ? "radial-gradient(#6366f1 1px, transparent 1px), radial-gradient(#6366f1 1px, #020617 1px)"
+              : "radial-gradient(#6366f1 1px, transparent 1px), radial-gradient(#6366f1 1px, #cbd5e1 1px)",
           backgroundSize: "40px 40px",
           backgroundPosition: "0 0, 20px 20px",
         }}
@@ -416,6 +421,7 @@ export const LiveGoogleMap: React.FC<LiveGoogleMapProps> = ({
   onSelectVehicle,
 }) => {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+  const { resolvedTheme } = useThemeStore();
 
   // Selected vehicle object
   const selectedVehicle = useMemo(() => {
@@ -468,14 +474,14 @@ export const LiveGoogleMap: React.FC<LiveGoogleMapProps> = ({
 
   return (
     <APIProvider apiKey={apiKey}>
-      <div className="relative w-full h-full bg-slate-950">
+      <div className="relative w-full h-full bg-slate-100 dark:bg-slate-950">
         <Map
           defaultCenter={center}
           defaultZoom={13}
           mapId="DEMO_MAP_ID"
           gestureHandling="greedy"
           disableDefaultUI={false}
-          styles={DARK_MAP_STYLES}
+          styles={resolvedTheme === "dark" ? DARK_MAP_STYLES : undefined}
           className="w-full h-full"
           onClick={(e) => {
             if (isDrawingMode && onMapClick && e.detail.latLng) {

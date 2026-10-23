@@ -56,31 +56,31 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
   const getStatusDot = (st: VehicleStatus) => {
     switch (st) {
       case "ACTIVE":
-        return <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />;
+        return <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />;
       case "IDLE":
-        return <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />;
+        return <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />;
       case "OFFLINE":
       default:
-        return <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />;
+        return <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />;
       case "MAINTENANCE":
-        return <span className="w-2.5 h-2.5 rounded-full bg-orange-400" />;
+        return <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />;
     }
   };
 
   return (
-    <div className="w-full lg:w-80 xl:w-96 h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 select-none">
+    <div className="w-full lg:w-80 xl:w-96 h-full flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0 select-none transition-colors">
       {/* Header & Connection status */}
-      <div className="p-4 border-b border-slate-800/80 bg-slate-950/40">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/40">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Truck className="w-5 h-5 text-indigo-400" />
-            <h2 className="font-bold text-white text-base">Fleet Radar</h2>
+            <Truck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="font-bold text-slate-900 dark:text-white text-base">Fleet Radar</h2>
           </div>
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
               isConnected
-                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
             }`}
           >
             {isConnected ? (
@@ -103,8 +103,8 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
             onClick={() => setStatusFilter("ALL")}
             className={`py-1.5 px-2 rounded-lg text-xs font-medium transition ${
               statusFilter === "ALL"
-                ? "bg-indigo-600 text-white font-bold"
-                : "bg-slate-800/70 text-slate-300 hover:bg-slate-800"
+                ? "bg-indigo-600 text-white font-bold shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800"
             }`}
           >
             All ({counts.total})
@@ -113,8 +113,8 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
             onClick={() => setStatusFilter("ACTIVE")}
             className={`py-1.5 px-2 rounded-lg text-xs font-medium transition ${
               statusFilter === "ACTIVE"
-                ? "bg-emerald-600 text-white font-bold"
-                : "bg-slate-800/70 text-emerald-400 hover:bg-slate-800"
+                ? "bg-emerald-600 text-white font-bold shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800/70 text-emerald-700 dark:text-emerald-400 hover:bg-slate-200 dark:hover:bg-slate-800"
             }`}
           >
             Act ({counts.active})
@@ -123,8 +123,8 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
             onClick={() => setStatusFilter("IDLE")}
             className={`py-1.5 px-2 rounded-lg text-xs font-medium transition ${
               statusFilter === "IDLE"
-                ? "bg-amber-600 text-white font-bold"
-                : "bg-slate-800/70 text-amber-400 hover:bg-slate-800"
+                ? "bg-amber-600 text-white font-bold shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800/70 text-amber-700 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-800"
             }`}
           >
             Idl ({counts.idle})
@@ -133,8 +133,8 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
             onClick={() => setStatusFilter("OFFLINE")}
             className={`py-1.5 px-2 rounded-lg text-xs font-medium transition ${
               statusFilter === "OFFLINE"
-                ? "bg-rose-600 text-white font-bold"
-                : "bg-slate-800/70 text-rose-400 hover:bg-slate-800"
+                ? "bg-rose-600 text-white font-bold shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800/70 text-rose-700 dark:text-rose-400 hover:bg-slate-200 dark:hover:bg-slate-800"
             }`}
           >
             Off ({counts.offline})
@@ -149,15 +149,15 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search plate, model, brand..."
-            className="w-full bg-slate-950/70 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            className="w-full bg-white dark:bg-slate-950/70 border border-slate-200 dark:border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
         </div>
       </div>
 
       {/* Vehicle List */}
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-800/60">
+      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
         {filteredVehicles.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-xs">
+          <div className="p-8 text-center text-slate-400 dark:text-slate-500 text-xs">
             No vehicles match your search filter
           </div>
         ) : (
@@ -169,34 +169,34 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
                 onClick={() => onSelectVehicle(vehicle.id)}
                 className={`p-3.5 cursor-pointer transition flex items-center justify-between ${
                   isSelected
-                    ? "bg-indigo-950/60 border-l-4 border-indigo-500"
-                    : "hover:bg-slate-800/50"
+                    ? "bg-indigo-50/80 dark:bg-indigo-950/60 border-l-4 border-indigo-600 dark:border-indigo-500"
+                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-slate-950 border border-slate-800">
-                    <Truck className="w-4 h-4 text-slate-300" />
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                    <Truck className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-white">
+                      <span className="font-bold text-xs text-slate-900 dark:text-white">
                         {vehicle.plate_number}
                       </span>
                       {getStatusDot(vehicle.status)}
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                       {vehicle.make ? `${vehicle.make} ${vehicle.model || ""}` : vehicle.type}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-mono font-semibold text-emerald-400">
+                  <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                     {vehicle.speed !== null && vehicle.speed !== undefined
                       ? `${Math.round(vehicle.speed)} km/h`
                       : "0 km/h"}
                   </span>
-                  <p className="text-[10px] text-slate-500 mt-0.5">
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
                     {vehicle.heading !== null && vehicle.heading !== undefined
                       ? `${Math.round(vehicle.heading)}°`
                       : "0°"}
