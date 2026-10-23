@@ -7,7 +7,7 @@ import { GeofenceDrawModal } from "../components/map/GeofenceDrawModal";
 import { deliveryService } from "../services/deliveryService";
 import { geofenceService } from "../services/geofenceService";
 import { Delivery } from "../types/delivery";
-import { Coordinate, Geofence, GeofenceCreatePayload } from "../types/geofence";
+import { Coordinate, Geofence } from "../types/geofence";
 import { decodePolyline } from "../utils/polyline";
 import { useToast } from "../components/ui/Toast";
 import { useAuthStore } from "../store/authStore";
@@ -130,8 +130,13 @@ export const TrackingDashboardPage: React.FC = () => {
     setDrawingPoints((prev) => [...prev, coord]);
   };
 
-  const handleSaveGeofence = async (payload: GeofenceCreatePayload) => {
-    const created = await geofenceService.createGeofence(payload);
+  const handleSaveGeofence = async (name: string, description: string, speedLimit?: number) => {
+    const created = await geofenceService.createGeofence({
+      name,
+      description: description || undefined,
+      speed_limit: speedLimit,
+      coordinates: drawingPoints,
+    });
     setGeofences((prev) => [created, ...prev]);
     setIsDrawingMode(false);
     setDrawingPoints([]);
@@ -161,7 +166,7 @@ export const TrackingDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100dvh-8.5rem)] sm:h-[calc(100vh-10rem)] min-h-[480px] flex overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+    <div className="relative w-full flex-1 min-h-[480px] flex overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl dark:shadow-2xl transition-colors">
       {/* Left Sidebar: Vehicle Status List */}
       <div
         className={`${
@@ -238,7 +243,7 @@ export const TrackingDashboardPage: React.FC = () => {
               <>
                 <button
                   onClick={() => setIsDrawingMode(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-indigo-400 hover:text-white border border-indigo-500/30 text-xs font-semibold shadow-xl backdrop-blur-md transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-white border border-indigo-200 dark:border-indigo-500/30 text-xs font-semibold shadow-lg dark:shadow-xl backdrop-blur-md transition"
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Draw Geofence</span>
@@ -246,15 +251,15 @@ export const TrackingDashboardPage: React.FC = () => {
 
                 <button
                   onClick={() => setShowGeofencesList(!showGeofencesList)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold shadow-xl backdrop-blur-md transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/80 text-xs font-semibold shadow-lg dark:shadow-xl backdrop-blur-md transition"
                 >
-                  <Layers className="w-3.5 h-3.5 text-indigo-400" />
+                  <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Zones ({geofences.length})</span>
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-2 bg-slate-900/95 border border-indigo-500/50 p-1.5 rounded-2xl shadow-2xl backdrop-blur-md animate-in fade-in">
-                <span className="text-[11px] font-medium text-slate-300 px-2">
+              <div className="flex items-center gap-2 bg-white/95 dark:bg-slate-900/95 border border-indigo-500/50 p-1.5 rounded-2xl shadow-xl dark:shadow-2xl backdrop-blur-md animate-in fade-in">
+                <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300 px-2">
                   Click on map ({drawingPoints.length} points)
                 </span>
 
@@ -270,7 +275,7 @@ export const TrackingDashboardPage: React.FC = () => {
                 <button
                   onClick={() => setDrawingPoints([])}
                   disabled={drawingPoints.length === 0}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white transition disabled:opacity-40"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white transition disabled:opacity-40"
                   title="Reset points"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -281,7 +286,7 @@ export const TrackingDashboardPage: React.FC = () => {
                     setIsDrawingMode(false);
                     setDrawingPoints([]);
                   }}
-                  className="px-2 py-1 rounded-lg text-slate-400 hover:text-white text-xs font-medium transition"
+                  className="px-2 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white text-xs font-medium transition"
                 >
                   Cancel
                 </button>
@@ -292,22 +297,22 @@ export const TrackingDashboardPage: React.FC = () => {
 
         {/* Zones List Flyout */}
         {showGeofencesList && (
-          <div className="absolute top-14 right-3 z-20 w-72 sm:w-80 rounded-2xl bg-slate-900/95 border border-slate-800 p-3 shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs font-bold text-white">
+          <div className="absolute top-14 right-3 z-20 w-72 sm:w-80 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-3 shadow-xl dark:shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white">
               <span className="flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-indigo-400" />
+                <Shield className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 Active Geofence Zones
               </span>
               <button
                 onClick={() => setShowGeofencesList(false)}
-                className="text-slate-400 hover:text-white text-xs"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-xs"
               >
                 Close
               </button>
             </div>
 
             {geofences.length === 0 ? (
-              <p className="text-xs text-slate-400 py-4 text-center">
+              <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">
                 No geofences created yet. Click "Draw Geofence" to create one.
               </p>
             ) : (
@@ -315,11 +320,11 @@ export const TrackingDashboardPage: React.FC = () => {
                 {geofences.map((gf) => (
                   <div
                     key={gf.id}
-                    className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs"
                   >
                     <div>
-                      <h4 className="font-semibold text-white">{gf.name}</h4>
-                      <p className="text-[11px] text-slate-400">
+                      <h4 className="font-semibold text-slate-900 dark:text-white">{gf.name}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         {gf.speed_limit
                           ? `Limit: ${gf.speed_limit} km/h`
                           : "No speed restriction"}
@@ -328,7 +333,7 @@ export const TrackingDashboardPage: React.FC = () => {
                     {canManageGeofences && (
                       <button
                         onClick={() => handleDeleteGeofence(gf.id, gf.name)}
-                        className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
                         title="Delete geofence"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -343,32 +348,32 @@ export const TrackingDashboardPage: React.FC = () => {
 
         {/* Floating Active Delivery Route Overlay Card */}
         {activeDelivery && (
-          <div className="absolute top-3 left-3 right-3 sm:right-auto sm:max-w-md z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3 shadow-2xl">
+          <div className="absolute top-3 left-3 right-3 sm:right-auto sm:max-w-md z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 shadow-xl dark:shadow-2xl">
             <div className="flex items-center justify-between text-xs mb-1">
-              <div className="flex items-center gap-1.5 font-bold text-white min-w-0">
-                <Package className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white min-w-0">
+                <Package className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span className="truncate">Active Delivery: {activeDelivery.order_number}</span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0 ml-2">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shrink-0 ml-2">
                 {activeDelivery.status}
               </span>
             </div>
 
             <div className="space-y-1 text-xs">
-              <div className="flex items-center gap-1.5 text-slate-300 truncate">
-                <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 truncate">
+                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span className="text-slate-400">To:</span>
-                <span className="font-medium text-white truncate">
+                <span className="font-medium text-slate-900 dark:text-white truncate">
                   {activeDelivery.dropoff_address}
                 </span>
               </div>
               {activeDelivery.planned_route && (
-                <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-400 pt-0.5">
+                <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 pt-0.5">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     ETA ~{activeDelivery.estimated_duration_mins ?? "--"}m
                   </span>
-                  <span className="text-slate-400">
+                  <span className="text-slate-500 dark:text-slate-400">
                     Dist:{" "}
                     {Math.round(
                       (activeDelivery.planned_route.distance_meters || 0) / 1000
@@ -376,7 +381,7 @@ export const TrackingDashboardPage: React.FC = () => {
                     km
                   </span>
                   {activeDelivery.planned_route.is_fallback && (
-                    <span className="text-amber-400 font-sans text-[10px]">
+                    <span className="text-amber-600 dark:text-amber-400 font-sans text-[10px]">
                       [Fallback]
                     </span>
                   )}
@@ -387,13 +392,13 @@ export const TrackingDashboardPage: React.FC = () => {
         )}
 
         {/* Mobile View Switcher Pill (< lg) */}
-        <div className="lg:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center bg-slate-900/95 border border-slate-700/90 p-1 rounded-2xl shadow-2xl backdrop-blur-md">
+        <div className="lg:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700/90 p-1 rounded-2xl shadow-xl dark:shadow-2xl backdrop-blur-md">
           <button
             onClick={() => setMobileTab("map")}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
               mobileTab === "map"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                : "text-slate-400 hover:text-white"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             <Radio className="w-3.5 h-3.5" />
@@ -404,7 +409,7 @@ export const TrackingDashboardPage: React.FC = () => {
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
               mobileTab === "list"
                 ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                : "text-slate-400 hover:text-white"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             <Truck className="w-3.5 h-3.5" />

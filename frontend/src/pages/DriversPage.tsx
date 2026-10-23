@@ -95,11 +95,11 @@ export const DriversPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-indigo-400" />
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+            <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
             Certified Driver Roster
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Driver profiles, license verifications, contact numbers, and vehicle assignments.
           </p>
         </div>
@@ -108,11 +108,11 @@ export const DriversPage: React.FC = () => {
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="p-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 rounded-xl transition-all"
+            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-all shadow-sm"
             title="Refresh drivers roster"
           >
             <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-400" : ""}`}
+              className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-500 dark:text-indigo-400" : ""}`}
             />
           </button>
           <button
@@ -133,9 +133,9 @@ export const DriversPage: React.FC = () => {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search license, phone, or email..."
@@ -144,7 +144,7 @@ export const DriversPage: React.FC = () => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
@@ -155,7 +155,7 @@ export const DriversPage: React.FC = () => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Driver Statuses</option>
             <option value="active">Active Certified</option>
@@ -170,14 +170,14 @@ export const DriversPage: React.FC = () => {
 
       {/* Drivers Grid */}
       {isLoadingDrivers ? (
-        <div className="w-full bg-slate-900 border border-slate-800 rounded-xl p-12 flex flex-col items-center justify-center space-y-4">
+        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 flex flex-col items-center justify-center space-y-4">
           <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-400 text-sm">Loading driver profiles...</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Loading driver profiles...</p>
         </div>
       ) : drivers.length === 0 ? (
-        <div className="w-full bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
-          <Users className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <h3 className="text-lg font-medium text-slate-300 mb-1">No drivers found</h3>
+        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center">
+          <Users className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+          <h3 className="text-lg font-medium text-slate-800 dark:text-slate-300 mb-1">No drivers found</h3>
           <p className="text-slate-500 text-sm max-w-sm mx-auto">
             No driver profiles match your criteria. You can register a new driver using their user ID.
           </p>
@@ -205,14 +205,14 @@ export const DriversPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Next
             </button>

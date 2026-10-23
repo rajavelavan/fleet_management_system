@@ -164,13 +164,13 @@ export const DriverPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col space-y-4 min-h-[calc(100dvh-8.5rem)]">
+    <div className="flex flex-col space-y-4 flex-1 min-h-[500px]">
       {/* Mobile Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:px-4 sm:py-3 shadow-md gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link
-            to="/"
-            title="Return to Overview"
+            to="/map"
+            title="Return to Live Map"
             className="p-2 bg-slate-950 text-slate-300 hover:text-white rounded-xl border border-slate-800 transition shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
