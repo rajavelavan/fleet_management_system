@@ -4,16 +4,20 @@ import {
   Activity,
   BarChart3,
   CheckCircle2,
+  ChevronRight,
   Database,
   Layers,
   Lock,
   LogOut,
+  Menu,
+  Navigation as NavIcon,
   Package,
   Radio,
   Server,
   ShieldCheck,
   Truck,
   Users,
+  X,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -28,6 +32,8 @@ import { DriversPage } from "./pages/DriversPage";
 import { DeliveriesPage } from "./pages/DeliveriesPage";
 import { TrackingDashboardPage } from "./pages/TrackingDashboardPage";
 import { NotificationBell } from "./components/notifications/NotificationBell";
+import { UserProfileMenu } from "./components/UserProfileMenu";
+import { UserProfileModal } from "./components/UserProfileModal";
 import authService, { RoleTestResponse } from "./services/authService";
 import { useAuthStore } from "./store/authStore";
 
@@ -35,6 +41,13 @@ export const NavigationBar: React.FC = () => {
   const location = useLocation();
   const { user, role, isAuthenticated, clearAuth } = useAuthStore();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // Auto-close mobile drawer on route transition
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -43,101 +56,189 @@ export const NavigationBar: React.FC = () => {
       // Ignore logout errors and proceed
     } finally {
       clearAuth();
+      setIsMobileMenuOpen(false);
       navigate("/login");
     }
   };
 
   const navLinks = [
-    { path: "/", label: "Overview & Health", icon: Activity },
-    { path: "/map", label: "Live Fleet Map", icon: Radio },
-    { path: "/deliveries", label: "Deliveries & Routes", icon: Package },
-    { path: "/vehicles", label: "Vehicles Roster", icon: Truck },
-    { path: "/drivers", label: "Driver Registry", icon: Users },
-    { path: "/admin", label: "Admin Analytics", icon: BarChart3 },
+    { path: "/", label: "Overview", icon: Activity },
+    { path: "/map", label: "Live Map", icon: Radio },
+    { path: "/deliveries", label: "Deliveries", icon: Package },
+    { path: "/vehicles", label: "Vehicles", icon: Truck },
+    { path: "/drivers", label: "Drivers", icon: Users },
+    ...(role === "DRIVER" || role === "ADMIN" || role === "DISPATCHER"
+      ? [{ path: "/driver", label: "Driver Console", icon: NavIcon }]
+      : []),
+    ...(role === "ADMIN"
+      ? [{ path: "/admin", label: "Admin Analytics", icon: BarChart3 }]
+      : []),
   ];
 
   return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800 gap-4">
-      <div className="flex items-center space-x-4">
-        <Link to="/" className="flex items-center space-x-3 group">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
-            <Truck className="w-6 h-6 text-white" />
+    <header className="pb-5 border-b border-slate-800">
+      <div className="flex items-center justify-between gap-4">
+        {/* Brand / Logo */}
+        <Link to="/" className="flex items-center space-x-3 group shrink-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
+            <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
               Fleet Logistics
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                Sprint 4 Live Map
-              </span>
             </h1>
-            <p className="text-xs text-slate-400">
-              Real-Time Fleet Telemetry & Mobile Driver Navigation
+            <p className="text-[11px] text-slate-400 hidden sm:block">
+              Real-Time Telemetry & Mobile Dispatch
             </p>
           </div>
         </Link>
-      </div>
 
-      {/* Nav Menu Tabs */}
-      <nav className="flex items-center space-x-1 bg-slate-900 border border-slate-800/80 p-1 rounded-xl">
-        {navLinks.map((link) => {
-          const Icon = link.icon;
-          const isActive = location.pathname === link.path;
-          return (
+        {/* Desktop Nav Menu Tabs (lg+) */}
+        <nav className="hidden lg:flex items-center space-x-1 bg-slate-900 border border-slate-800/80 p-1 rounded-xl">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            const isActive = location.pathname === link.path;
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Desktop User Session & Header Actions (lg+) */}
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
+          {isAuthenticated && <NotificationBell />}
+          {isAuthenticated && user ? (
+            <UserProfileMenu
+              user={user}
+              role={role}
+              onLogout={handleLogout}
+              onOpenProfile={() => setIsProfileModalOpen(true)}
+            />
+          ) : (
             <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                isActive
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-              }`}
+              to="/login"
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition shadow-lg shadow-indigo-500/20"
             >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{link.label}</span>
+              <Lock className="w-4 h-4" />
+              Sign In
             </Link>
-          );
-        })}
-      </nav>
+          )}
+        </div>
 
-      {/* User Session & Header Actions */}
-      <div className="flex items-center gap-3">
-        {isAuthenticated && <NotificationBell />}
-        {isAuthenticated && user ? (
-          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <div className="text-xs">
-              <span className="text-slate-400 hidden sm:inline">User: </span>
-              <span className="font-medium text-white">{user.email}</span>
-            </div>
-            <span
-              className={`ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                role === "ADMIN"
-                  ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
-                  : role === "DISPATCHER"
-                  ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                  : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-              }`}
-            >
-              {role || user.role}
-            </span>
-            <button
-              onClick={handleLogout}
-              title="Logout"
-              className="ml-2 p-1 text-slate-400 hover:text-rose-400 transition"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <Link
-            to="/login"
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition shadow-lg shadow-indigo-500/20"
+        {/* Mobile Header Controls (< lg) */}
+        <div className="flex lg:hidden items-center gap-2">
+          {isAuthenticated && <NotificationBell />}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            aria-label="Toggle navigation menu"
           >
-            <Lock className="w-4 h-4" />
-            Sign In
-          </Link>
-        )}
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5 text-indigo-400" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Drawer Overlay / Menu (< lg) */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden mt-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* User Session Info inside Drawer */}
+          {isAuthenticated && user ? (
+            <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-white truncate">
+                      {user.email}
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Active Session &bull;{" "}
+                      <span className="font-bold text-indigo-400">
+                        {role || user.role}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/30 text-xs font-medium hover:bg-rose-500/20 transition shrink-0"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsProfileModalOpen(true);
+                }}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-indigo-600/10 border border-indigo-500/20 text-indigo-300 hover:bg-indigo-600/20 text-xs font-medium transition"
+              >
+                <span>Visit Full Profile Details</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition"
+            >
+              <Lock className="w-4 h-4" />
+              <span>Sign In to Fleet</span>
+            </Link>
+          )}
+
+          {/* Navigation Links with generous touch targets (>= 44px) */}
+          <nav className="flex flex-col space-y-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/25"
+                      : "text-slate-300 hover:text-white hover:bg-slate-800/80"
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
+
+      {isAuthenticated && user && (
+        <UserProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          user={user}
+          role={role}
+          onLogout={handleLogout}
+        />
+      )}
     </header>
   );
 };
@@ -652,8 +753,8 @@ export const App: React.FC = () => {
         </main>
 
         <footer className="border-t border-slate-800/80 pt-6 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div>
-            Fleet & Logistics Management System &bull; Sprint 2: Vehicle & Driver Management
+          <div className="text-center sm:text-left">
+            Fleet & Logistics Management System &bull; Real-Time Telemetry & Dispatch
           </div>
           <div className="flex items-center gap-4">
             <a
@@ -662,7 +763,7 @@ export const App: React.FC = () => {
               rel="noreferrer"
               className="hover:text-slate-300 transition"
             >
-              /api/v1/health
+              System Health
             </a>
             <span>&bull;</span>
             <a
@@ -671,7 +772,7 @@ export const App: React.FC = () => {
               rel="noreferrer"
               className="hover:text-slate-300 transition"
             >
-              Swagger UI Docs
+              API Docs
             </a>
           </div>
         </footer>
