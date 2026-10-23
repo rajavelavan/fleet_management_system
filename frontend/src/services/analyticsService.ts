@@ -2,11 +2,17 @@ import apiClient from "../api/client";
 import {
   AlertsBreakdownResponse,
   DeliveriesTrendResponse,
+  HealthCheckResponse,
   KPISummaryResponse,
   TripSummaryResponse,
 } from "../types/analytics";
 
 export const analyticsService = {
+  async getSystemHealth(): Promise<HealthCheckResponse> {
+    const res = await apiClient.get<HealthCheckResponse>("/api/v1/health");
+    return res.data;
+  },
+
   async getKPISummary(): Promise<KPISummaryResponse> {
     const res = await apiClient.get<KPISummaryResponse>("/api/v1/analytics/kpi-summary");
     return res.data;
