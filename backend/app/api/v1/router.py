@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     geofences,
     health,
     reports,
+    tasks,
     tracking,
     vehicles,
 )
@@ -15,6 +16,9 @@ from app.api.v1.endpoints import (
 api_router = APIRouter()
 
 api_router.include_router(health.router, tags=["Health"])
+api_router.include_router(
+    tasks.router, prefix="/tasks", tags=["Scheduled Background Tasks"]
+)
 api_router.include_router(
     auth.router, prefix="/auth", tags=["Authentication & User Management"]
 )

@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     COOKIE_SECURE: bool = False  # Set to True in HTTPS production
     COOKIE_SAMESITE: str = "lax"
+    CRON_SECRET: str = "fleet-cron-secret-change-me"
 
     # Database Settings (PostgreSQL + PostGIS)
     POSTGRES_SERVER: str = "postgres"
@@ -38,6 +39,11 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_db_connection(cls, v: str | None, values: Any) -> Any:
         if isinstance(v, str) and v:
+            # Normalize Neon / Supabase / Render connection URLs to asyncpg format
+            if v.startswith("postgres://"):
+                v = v.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
+                v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
             return v
         data = values.data
         return str(
