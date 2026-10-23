@@ -44,6 +44,9 @@ class Settings(BaseSettings):
                 v = v.replace("postgres://", "postgresql+asyncpg://", 1)
             elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            # asyncpg expects 'ssl', not 'sslmode' (Neon defaults to ?sslmode=require)
+            if "sslmode=" in v:
+                v = v.replace("sslmode=", "ssl=")
             return v
         data = values.data
         return str(
