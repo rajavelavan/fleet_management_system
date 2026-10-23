@@ -21,6 +21,8 @@ import {
   RotateCcw,
   Layers,
   Trash2,
+  Truck,
+  Radio,
 } from "lucide-react";
 
 export const TrackingDashboardPage: React.FC = () => {
@@ -38,6 +40,7 @@ export const TrackingDashboardPage: React.FC = () => {
 
   const [activeDeliveries, setActiveDeliveries] = useState<Delivery[]>([]);
   const [selectedDeliveryId, setSelectedDeliveryId] = useState<string | null>(null);
+  const [mobileTab, setMobileTab] = useState<"map" | "list">("map");
 
   // Geofencing states
   const [geofences, setGeofences] = useState<Geofence[]>([]);
@@ -158,23 +161,34 @@ export const TrackingDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-10rem)] min-h-[550px] flex overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
+    <div className="relative w-full h-[calc(100dvh-8.5rem)] sm:h-[calc(100vh-10rem)] min-h-[480px] flex overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
       {/* Left Sidebar: Vehicle Status List */}
-      <VehicleSidebar
-        vehicles={vehicleList}
-        selectedVehicleId={selectedVehicleId}
-        isConnected={isConnected}
-        onSelectVehicle={(id) => {
-          setSelectedVehicleId(id);
-          const relatedDelivery = activeDeliveries.find((d) => d.vehicle_id === id);
-          if (relatedDelivery) {
-            setSelectedDeliveryId(relatedDelivery.id);
-          }
-        }}
-      />
+      <div
+        className={`${
+          mobileTab === "list" ? "block w-full h-full" : "hidden"
+        } lg:block lg:w-80 xl:w-96 shrink-0 h-full`}
+      >
+        <VehicleSidebar
+          vehicles={vehicleList}
+          selectedVehicleId={selectedVehicleId}
+          isConnected={isConnected}
+          onSelectVehicle={(id) => {
+            setSelectedVehicleId(id);
+            setMobileTab("map");
+            const relatedDelivery = activeDeliveries.find((d) => d.vehicle_id === id);
+            if (relatedDelivery) {
+              setSelectedDeliveryId(relatedDelivery.id);
+            }
+          }}
+        />
+      </div>
 
       {/* Main Center Area: Full-screen Live Google Map with Planned Delivery Route Overlay */}
-      <div className="relative flex-1 h-full">
+      <div
+        className={`relative flex-1 h-full ${
+          mobileTab === "map" ? "block" : "hidden lg:block"
+        }`}
+      >
         <LiveGoogleMap
           vehicles={vehicleList}
           selectedVehicleId={selectedVehicleId}
@@ -215,7 +229,11 @@ export const TrackingDashboardPage: React.FC = () => {
 
         {/* Floating Top-Right Map Controls: Geofence Drawing Tools */}
         {canManageGeofences && (
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+          <div
+            className={`absolute ${
+              activeDelivery ? "top-24 sm:top-3.5" : "top-3.5"
+            } right-3 z-20 flex items-center gap-2`}
+          >
             {!isDrawingMode ? (
               <>
                 <button
@@ -223,7 +241,7 @@ export const TrackingDashboardPage: React.FC = () => {
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-indigo-400 hover:text-white border border-indigo-500/30 text-xs font-semibold shadow-xl backdrop-blur-md transition"
                 >
                   <PenTool className="w-3.5 h-3.5" />
-                  <span>Draw Geofence</span>
+                  <span className="hidden sm:inline">Draw Geofence</span>
                 </button>
 
                 <button
@@ -274,7 +292,7 @@ export const TrackingDashboardPage: React.FC = () => {
 
         {/* Zones List Flyout */}
         {showGeofencesList && (
-          <div className="absolute top-14 right-4 z-20 w-80 rounded-2xl bg-slate-900/95 border border-slate-800 p-3 shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto">
+          <div className="absolute top-14 right-3 z-20 w-72 sm:w-80 rounded-2xl bg-slate-900/95 border border-slate-800 p-3 shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto">
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs font-bold text-white">
               <span className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5 text-indigo-400" />
@@ -325,13 +343,13 @@ export const TrackingDashboardPage: React.FC = () => {
 
         {/* Floating Active Delivery Route Overlay Card */}
         {activeDelivery && (
-          <div className="absolute top-4 left-4 z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl max-w-sm sm:max-w-md">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <div className="flex items-center gap-1.5 font-bold text-white">
-                <Package className="w-4 h-4 text-emerald-400" />
-                <span>Active Delivery: {activeDelivery.order_number}</span>
+          <div className="absolute top-3 left-3 right-3 sm:right-auto sm:max-w-md z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3 shadow-2xl">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <div className="flex items-center gap-1.5 font-bold text-white min-w-0">
+                <Package className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="truncate">Active Delivery: {activeDelivery.order_number}</span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0 ml-2">
                 {activeDelivery.status}
               </span>
             </div>
@@ -345,10 +363,10 @@ export const TrackingDashboardPage: React.FC = () => {
                 </span>
               </div>
               {activeDelivery.planned_route && (
-                <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-400 pt-1">
+                <div className="flex items-center gap-3 text-[11px] font-mono text-emerald-400 pt-0.5">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    ETA: ~{activeDelivery.estimated_duration_mins ?? "--"}m
+                    ETA ~{activeDelivery.estimated_duration_mins ?? "--"}m
                   </span>
                   <span className="text-slate-400">
                     Dist:{" "}
@@ -359,7 +377,7 @@ export const TrackingDashboardPage: React.FC = () => {
                   </span>
                   {activeDelivery.planned_route.is_fallback && (
                     <span className="text-amber-400 font-sans text-[10px]">
-                      [Fallback Path]
+                      [Fallback]
                     </span>
                   )}
                 </div>
@@ -367,6 +385,32 @@ export const TrackingDashboardPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Mobile View Switcher Pill (< lg) */}
+        <div className="lg:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center bg-slate-900/95 border border-slate-700/90 p-1 rounded-2xl shadow-2xl backdrop-blur-md">
+          <button
+            onClick={() => setMobileTab("map")}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+              mobileTab === "map"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Radio className="w-3.5 h-3.5" />
+            <span>Map</span>
+          </button>
+          <button
+            onClick={() => setMobileTab("list")}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition ${
+              mobileTab === "list"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Truck className="w-3.5 h-3.5" />
+            <span>Fleet ({vehicleList.length})</span>
+          </button>
+        </div>
 
         {/* Click-to-Open Vehicle Info Panel and 30-min route status */}
         <VehicleInfoPanel

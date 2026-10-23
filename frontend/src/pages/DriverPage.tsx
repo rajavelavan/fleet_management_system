@@ -164,18 +164,19 @@ export const DriverPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] min-h-[580px] space-y-4">
+    <div className="flex flex-col space-y-4 min-h-[calc(100dvh-8.5rem)]">
       {/* Mobile Top Header */}
-      <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl px-4 py-3 shadow-md">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:px-4 sm:py-3 shadow-md gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             to="/"
-            className="p-2 bg-slate-950 text-slate-300 hover:text-white rounded-xl border border-slate-800 transition"
+            title="Return to Overview"
+            className="p-2 bg-slate-950 text-slate-300 hover:text-white rounded-xl border border-slate-800 transition shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-base font-bold text-white leading-tight">
                 Driver Navigation & Workflow
               </h1>
@@ -185,7 +186,7 @@ export const DriverPage: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-400 truncate mt-0.5">
               Vehicle:{" "}
               <strong className="text-white">
                 {activeDelivery?.vehicle?.plate_number || myVehicle.plate_number}
@@ -198,7 +199,7 @@ export const DriverPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/80">
           <button
             onClick={fetchDriverAndDelivery}
             title="Refresh order"
@@ -207,7 +208,7 @@ export const DriverPage: React.FC = () => {
             <RotateCw className="w-3.5 h-3.5" />
           </button>
           <div
-            className={`flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
+            className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
               isConnected
                 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                 : "bg-rose-500/10 text-rose-400 border-rose-500/20"
@@ -216,12 +217,12 @@ export const DriverPage: React.FC = () => {
             {isConnected ? (
               <>
                 <Wifi className="w-3 h-3" />
-                <span className="hidden sm:inline">Telemetry Uplink</span>
+                <span>Telemetry Uplink</span>
               </>
             ) : (
               <>
                 <WifiOff className="w-3 h-3" />
-                <span className="hidden sm:inline">Reconnecting</span>
+                <span>Reconnecting</span>
               </>
             )}
           </div>
@@ -229,9 +230,9 @@ export const DriverPage: React.FC = () => {
       </div>
 
       {/* Main Responsive Grid: Map + Driver Telemetry Dashboard */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4">
         {/* Dedicated Mobile / Driver Map View with Polyline */}
-        <div className="relative flex-1 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-xl min-h-[320px]">
+        <div className="relative w-full h-72 sm:h-96 lg:h-auto lg:flex-1 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-xl min-h-[280px]">
           <LiveGoogleMap
             vehicles={[myVehicle]}
             selectedVehicleId={myVehicle.id}
@@ -260,14 +261,14 @@ export const DriverPage: React.FC = () => {
 
           {/* Floating Trip Target Overlay Pill */}
           {activeDelivery && (
-            <div className="absolute top-4 left-4 right-4 sm:right-auto sm:max-w-md z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3 shadow-xl">
+            <div className="absolute top-3 left-3 right-3 sm:right-auto sm:max-w-md z-20 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-3 shadow-xl">
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-400 flex items-center gap-1.5 font-medium">
                   <Flag className="w-3.5 h-3.5 text-indigo-400" />
                   Destination
                 </span>
-                <span className="text-emerald-400 font-bold font-mono">
-                  ETA ~{activeDelivery.estimated_duration_mins ?? "--"} mins (
+                <span className="text-emerald-400 font-bold font-mono text-[11px]">
+                  ETA ~{activeDelivery.estimated_duration_mins ?? "--"}m (
                   {Math.round(
                     (activeDelivery.planned_route?.distance_meters || 0) / 1000
                   )}{" "}
@@ -285,7 +286,7 @@ export const DriverPage: React.FC = () => {
         </div>
 
         {/* Mobile-Friendly Telemetry & Trip Controls Sheet */}
-        <div className="w-full lg:w-84 shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-xl space-y-4">
+        <div className="w-full lg:w-96 shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-xl space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <div className="flex items-center gap-2">
@@ -353,7 +354,7 @@ export const DriverPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Workflow Action Buttons */}
+          {/* Workflow Action Buttons with large touch targets */}
           <div className="space-y-2 pt-2 border-t border-slate-800">
             <div className="text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
               <PackageCheck className="w-4 h-4 text-indigo-400" />
@@ -367,10 +368,10 @@ export const DriverPage: React.FC = () => {
                   <button
                     onClick={() => handleUpdateStatus("PICKED_UP")}
                     disabled={actionLoading}
-                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
+                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition disabled:opacity-50"
                   >
                     <Truck className="w-4 h-4" />
-                    <span>[Mark Picked Up]</span>
+                    <span>Confirm Cargo Pickup</span>
                   </button>
                 )}
 
@@ -379,10 +380,10 @@ export const DriverPage: React.FC = () => {
                   <button
                     onClick={() => handleUpdateStatus("IN_TRANSIT")}
                     disabled={actionLoading}
-                    className="w-full py-2.5 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition disabled:opacity-50"
+                    className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30 transition disabled:opacity-50"
                   >
                     <Navigation className="w-4 h-4" />
-                    <span>[Start Transit]</span>
+                    <span>Start Transit (Depart)</span>
                   </button>
                 )}
 
@@ -392,10 +393,10 @@ export const DriverPage: React.FC = () => {
                   <button
                     onClick={() => handleUpdateStatus("DELIVERED")}
                     disabled={actionLoading}
-                    className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition disabled:opacity-50"
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition disabled:opacity-50"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>[Mark Delivered]</span>
+                    <span>Confirm Successful Delivery</span>
                   </button>
                 )}
 
