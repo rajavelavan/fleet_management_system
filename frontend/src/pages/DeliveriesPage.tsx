@@ -12,7 +12,13 @@ import {
   Trash2,
   CheckCircle2,
 } from "lucide-react";
-import { useDeliveries } from "../hooks/useDeliveries";
+import {
+  useDeliveries,
+  useCreateDelivery,
+  useAssignDelivery,
+  useCalculateRoute,
+  useDeleteDelivery,
+} from "../hooks/useDeliveries";
 import { useVehicles } from "../hooks/useVehicles";
 import { useDrivers } from "../hooks/useDrivers";
 import { useAuthStore } from "../store/authStore";
@@ -22,6 +28,7 @@ import { AssignDeliveryModal } from "../components/deliveries/AssignDeliveryModa
 
 export const DeliveriesPage: React.FC = () => {
   const { role } = useAuthStore();
+  const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<DeliveryStatus | "">("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -29,21 +36,26 @@ export const DeliveriesPage: React.FC = () => {
   const [calculatingId, setCalculatingId] = useState<string | null>(null);
 
   const {
-    deliveries,
-    total,
-    page,
-    setPage,
-    pages,
-    loading,
-    refresh,
-    createDelivery,
-    assignDelivery,
-    calculateRoute,
-    deleteDelivery,
+    data: deliveriesData,
+    isLoading,
+    isFetching,
+    refetch,
   } = useDeliveries({
-    search: searchTerm || undefined,
+    page,
+    size: 20,
+    search: searchTerm.trim() || undefined,
     status: statusFilter || undefined,
   });
+
+  const createDeliveryMutation = useCreateDelivery();
+  const assignDeliveryMutation = useAssignDelivery();
+  const calculateRouteMutation = useCalculateRoute();
+  const deleteDeliveryMutation = useDeleteDelivery();
+
+  const deliveries = deliveriesData?.items || [];
+  const total = deliveriesData?.total || 0;
+  const pages = deliveriesData?.pages || 1;
+  const loading = isLoading;
 
   const { data: vehiclesData } = useVehicles({ size: 100 });
   const { data: driversData } = useDrivers({ size: 100 });
@@ -54,29 +66,25 @@ export const DeliveriesPage: React.FC = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    refresh({
-      search: searchTerm.trim() || undefined,
-      status: statusFilter || undefined,
-      page: 1,
-    });
+    setPage(1);
   };
 
   const handleStatusFilter = (status: DeliveryStatus | "") => {
     setStatusFilter(status);
-    refresh({
-      search: searchTerm.trim() || undefined,
-      status: status || undefined,
-      page: 1,
-    });
+    setPage(1);
   };
 
   const handleCalculateRoute = async (deliveryId: string) => {
     try {
       setCalculatingId(deliveryId);
-      await calculateRoute(deliveryId);
+      await calculateRouteMutation.mutateAsync(deliveryId);
     } finally {
       setCalculatingId(null);
     }
+  };
+
+  const handleDeleteDelivery = async (deliveryId: string) => {
+    await deleteDeliveryMutation.mutateAsync(deliveryId);
   };
 
   const getStatusBadge = (status: DeliveryStatus) => {
@@ -161,7 +169,10 @@ export const DeliveriesPage: React.FC = () => {
             type="text"
             placeholder="Search order number or address..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
             className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
           />
         </form>
@@ -191,11 +202,11 @@ export const DeliveriesPage: React.FC = () => {
             </button>
           ))}
           <button
-            onClick={() => refresh()}
+            onClick={() => refetch()}
             title="Refresh"
             className="p-1.5 text-slate-400 hover:text-white bg-slate-950 border border-slate-800 rounded-lg hover:bg-slate-800 transition"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-400" : ""}`} />
           </button>
         </div>
       </div>
@@ -349,7 +360,7 @@ export const DeliveriesPage: React.FC = () => {
                                     `Delete delivery order ${delivery.order_number}?`
                                   )
                                 ) {
-                                  deleteDelivery(delivery.id);
+                                  handleDeleteDelivery(delivery.id);
                                 }
                               }}
                               title="Delete Order"
@@ -400,7 +411,7 @@ export const DeliveriesPage: React.FC = () => {
       <CreateDeliveryModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSubmit={createDelivery}
+        onSubmit={(payload) => createDeliveryMutation.mutateAsync(payload)}
         vehicles={vehicles}
       />
 
@@ -411,7 +422,9 @@ export const DeliveriesPage: React.FC = () => {
         delivery={assigningDelivery}
         vehicles={vehicles}
         drivers={drivers}
-        onAssign={assignDelivery}
+        onAssign={(deliveryId, payload) =>
+          assignDeliveryMutation.mutateAsync({ id: deliveryId, payload })
+        }
       />
     </div>
   );
