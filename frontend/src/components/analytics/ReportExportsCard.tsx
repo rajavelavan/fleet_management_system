@@ -34,22 +34,22 @@ export const ReportExportsCard: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm dark:shadow-xl space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/30">
+          <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/30">
             <FileSpreadsheet className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">Excel Report Generation</h3>
-            <p className="text-xs text-slate-400">
-              Download styled spreadsheet audits generated via backend <code className="text-indigo-400">openpyxl</code>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white">Excel Report Generation</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Download styled spreadsheet audits generated via backend <code className="text-indigo-600 dark:text-indigo-400">openpyxl</code>
             </p>
           </div>
         </div>
 
         {lastAction && (
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-500/20">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{lastAction}</span>
           </div>
@@ -58,16 +58,16 @@ export const ReportExportsCard: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Deliveries Export Card */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+        <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-indigo-400">Shipments Export</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono">
+              <span className="text-xs font-bold uppercase text-indigo-600 dark:text-indigo-400">Shipments Export</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-mono">
                 .XLSX STREAM
               </span>
             </div>
-            <h4 className="text-sm font-semibold text-white mt-1">Deliveries Operational Report</h4>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mt-1">Deliveries Operational Report</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
               Complete register of all shipments, origin/destination coordinates, assigned driver phone contacts, and delivery transit timelines.
             </p>
           </div>
@@ -92,16 +92,16 @@ export const ReportExportsCard: React.FC = () => {
         </div>
 
         {/* Vehicle Trips Export Card */}
-        <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
+        <div className="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-emerald-400">Telemetry Export</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">
+              <span className="text-xs font-bold uppercase text-emerald-600 dark:text-emerald-400">Telemetry Export</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-mono">
                 .XLSX STREAM
               </span>
             </div>
-            <h4 className="text-sm font-semibold text-white mt-1">Vehicle Trips & Telemetry Report</h4>
-            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mt-1">Vehicle Trips & Telemetry Report</h4>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
               Aggregated PostGIS distance calculations, operating duration hours, recorded average and peak speeds per fleet vehicle.
             </p>
           </div>

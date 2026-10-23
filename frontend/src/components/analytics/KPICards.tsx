@@ -19,7 +19,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-28 bg-slate-900 border border-slate-800 rounded-2xl p-5"
+            className="h-28 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5"
           />
         ))}
       </div>
@@ -32,7 +32,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
       value: `${kpi.fleet_status.active} / ${kpi.fleet_status.total}`,
       subtext: `${kpi.fleet_status.idle} idle, ${kpi.fleet_status.offline} offline`,
       icon: Truck,
-      color: "text-blue-400",
+      color: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-500/10",
       border: "border-blue-500/20",
     },
@@ -41,7 +41,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
       value: `${kpi.on_time_delivery_rate}%`,
       subtext: `${kpi.delivery_status.delivered} completed, ${kpi.delivery_status.failed} failed`,
       icon: TrendingUp,
-      color: "text-emerald-400",
+      color: "text-emerald-600 dark:text-emerald-400",
       bg: "bg-emerald-500/10",
       border: "border-emerald-500/20",
     },
@@ -50,7 +50,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
       value: `${kpi.delivery_status.in_transit + kpi.delivery_status.picked_up}`,
       subtext: `${kpi.delivery_status.pending} pending assignment`,
       icon: Package,
-      color: "text-indigo-400",
+      color: "text-indigo-600 dark:text-indigo-400",
       bg: "bg-indigo-500/10",
       border: "border-indigo-500/20",
     },
@@ -59,9 +59,9 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
       value: `${kpi.active_alerts_count}`,
       subtext: "Geofences, speeding, and offline",
       icon: AlertTriangle,
-      color: kpi.active_alerts_count > 0 ? "text-amber-400" : "text-slate-400",
-      bg: kpi.active_alerts_count > 0 ? "bg-amber-500/10" : "bg-slate-800/40",
-      border: kpi.active_alerts_count > 0 ? "border-amber-500/30" : "border-slate-800",
+      color: kpi.active_alerts_count > 0 ? "text-amber-600 dark:text-amber-400" : "text-slate-400",
+      bg: kpi.active_alerts_count > 0 ? "bg-amber-500/10" : "bg-slate-100 dark:bg-slate-800/40",
+      border: kpi.active_alerts_count > 0 ? "border-amber-500/30" : "border-slate-200 dark:border-slate-800",
     },
   ];
 
@@ -72,14 +72,14 @@ export const KPICards: React.FC<KPICardsProps> = ({ kpi, loading }) => {
         return (
           <div
             key={idx}
-            className="bg-slate-900 border border-slate-800/80 hover:border-slate-700/80 rounded-2xl p-5 shadow-lg flex items-center justify-between transition-all"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700/80 rounded-2xl p-5 shadow-sm dark:shadow-lg flex items-center justify-between transition-all"
           >
             <div>
-              <p className="text-xs font-medium text-slate-400">{card.title}</p>
-              <h3 className="text-2xl font-bold text-white mt-1 tracking-tight">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{card.title}</p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">
                 {card.value}
               </h3>
-              <p className="text-[11px] text-slate-500 mt-1">{card.subtext}</p>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{card.subtext}</p>
             </div>
             <div className={`p-3 rounded-xl border ${card.bg} ${card.border}`}>
               <Icon className={`w-6 h-6 ${card.color}`} />
