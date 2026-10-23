@@ -70,36 +70,46 @@ export const VehicleInfoPanel: React.FC<VehicleInfoPanelProps> = ({
     : "Just now";
 
   return (
-    <div className="absolute top-4 right-4 z-30 w-96 max-w-[calc(100vw-2rem)] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300">
-      {/* Header */}
-      <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl">
-            <Truck className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-bold text-white text-base leading-tight">
-              {vehicle.plate_number}
-            </h3>
-            <p className="text-xs text-slate-400">
-              {vehicle.make ? `${vehicle.make} ${vehicle.model || ""}` : vehicle.type}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {getStatusBadge(vehicle.status)}
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            title="Close Details"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop for bottom sheet */}
+      <div
+        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 sm:hidden"
+        onClick={onClose}
+      />
 
-      {/* Main Body */}
-      <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <div className="fixed sm:absolute inset-x-0 bottom-0 sm:bottom-auto sm:top-4 sm:right-4 sm:inset-x-auto z-40 w-full sm:w-96 max-w-full sm:max-w-[calc(100vw-2rem)] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100 transition-all duration-300 animate-in slide-in-from-bottom sm:slide-in-from-right">
+        {/* Mobile Drag Indicator */}
+        <div className="w-12 h-1 bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
+        {/* Header */}
+        <div className="px-5 py-3.5 sm:py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-base leading-tight">
+                {vehicle.plate_number}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {vehicle.make ? `${vehicle.make} ${vehicle.model || ""}` : vehicle.type}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {getStatusBadge(vehicle.status)}
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              title="Close Details"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Main Body */}
+        <div className="p-5 space-y-4 max-h-[55vh] sm:max-h-[70vh] overflow-y-auto">
         {/* Telemetry Metrics Grid */}
         <div className="grid grid-cols-2 gap-3">
           {/* Speed */}
@@ -205,5 +215,6 @@ export const VehicleInfoPanel: React.FC<VehicleInfoPanelProps> = ({
         </div>
       </div>
     </div>
-  );
+  </>
+);
 };

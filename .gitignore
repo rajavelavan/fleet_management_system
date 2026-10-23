@@ -30,6 +30,7 @@ htmlcov/
 venv/
 .venv/
 env/
+celerybeat-schedule
 
 # Node
 node_modules/

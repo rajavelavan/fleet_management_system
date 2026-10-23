@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Car,
   Fuel,
@@ -8,6 +9,7 @@ import {
   UserCheck,
   UserMinus,
   Edit2,
+  Radio,
 } from "lucide-react";
 import { Vehicle } from "../types/fleet";
 
@@ -78,8 +80,166 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900 shadow-xl">
-      <div className="overflow-x-auto">
+    <div className="w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
+      {/* Mobile Card List (< lg) */}
+      <div className="block lg:hidden divide-y divide-slate-800/80">
+        {vehicles.map((v) => {
+          const fuelPct =
+            v.fuel_capacity > 0
+              ? Math.min(100, Math.round((v.current_fuel / v.fuel_capacity) * 100))
+              : 0;
+
+          return (
+            <div key={v.id} className="p-4 space-y-3.5 hover:bg-slate-800/30 transition">
+              {/* Header: Plate, Status, Type */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-mono font-bold text-xs shrink-0">
+                    <Car className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-white text-base tracking-wide flex items-center gap-2 flex-wrap">
+                      <span>{v.plate_number}</span>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${getTypeBadge(
+                          v.type
+                        )}`}
+                      >
+                        {v.type}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-400 truncate">
+                      {v.year} {v.make} {v.model}
+                    </div>
+                  </div>
+                </div>
+
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(
+                    v.status
+                  )} shrink-0`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse"></span>
+                  {v.status}
+                </span>
+              </div>
+
+              {/* Grid: Driver & Fuel */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                {/* Driver */}
+                <div>
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block mb-1">
+                    Assigned Driver
+                  </span>
+                  {v.current_driver ? (
+                    <div className="flex items-center space-x-1.5 text-slate-200 font-medium">
+                      <UserCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="truncate">{v.current_driver.license_number}</span>
+                      <span className="text-slate-500 font-mono text-[11px]">
+                        ({v.current_driver.phone})
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-slate-500 italic">Unassigned</span>
+                  )}
+                </div>
+
+                {/* Fuel Bar */}
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-slate-400 flex items-center gap-1 text-[11px]">
+                      <Fuel className="w-3 h-3 text-amber-400" />
+                      {v.current_fuel}L
+                    </span>
+                    <span className="text-slate-400 text-[11px]">{fuelPct}%</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        fuelPct < 20
+                          ? "bg-rose-500"
+                          : fuelPct < 50
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
+                      }`}
+                      style={{ width: `${fuelPct}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* GPS Telemetry & Live Map Link */}
+              <div className="flex items-center justify-between text-xs text-slate-400 px-1 pt-0.5">
+                {v.last_lat !== undefined &&
+                v.last_lat !== null &&
+                v.last_lng !== undefined &&
+                v.last_lng !== null ? (
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1 text-cyan-400 font-mono text-[11px]">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {v.last_lat.toFixed(4)}, {v.last_lng.toFixed(4)}
+                    </span>
+                    {v.last_speed !== undefined && v.last_speed !== null && (
+                      <span className="flex items-center gap-1 font-mono text-[11px]">
+                        <Gauge className="w-3 h-3" />
+                        {v.last_speed.toFixed(0)} km/h
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-slate-600 italic">No GPS signal</span>
+                )}
+
+                <Link
+                  to="/map"
+                  className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-xs font-semibold transition"
+                >
+                  <Radio className="w-3 h-3" />
+                  <span>Track on Map</span>
+                </Link>
+              </div>
+
+              {/* Action Buttons Row */}
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
+                {v.current_driver ? (
+                  <button
+                    onClick={() => onUnassignDriver(v)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-medium hover:bg-amber-500/20 transition"
+                  >
+                    <UserMinus className="w-3.5 h-3.5" />
+                    <span>Unassign</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onAssignDriver(v)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-xs font-medium hover:bg-emerald-500/20 transition"
+                  >
+                    <UserCheck className="w-3.5 h-3.5" />
+                    <span>Assign Driver</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => onEdit(v)}
+                  className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-indigo-400 hover:bg-slate-700 transition"
+                  title="Edit Vehicle"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onDelete(v)}
+                  className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-rose-400 hover:bg-slate-700 transition"
+                  title="Delete Vehicle"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table View (lg+) */}
+      <div className="hidden lg:block overflow-x-auto">
         <table className="w-full text-left text-sm text-slate-300">
           <thead className="bg-slate-800/60 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
             <tr>
@@ -211,6 +371,13 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
                   <td className="px-6 py-4 text-right">
                     <div className="relative inline-block text-left">
                       <div className="flex items-center justify-end space-x-1">
+                        <Link
+                          to="/map"
+                          title="Track on Map"
+                          className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors"
+                        >
+                          <Radio className="w-4 h-4" />
+                        </Link>
                         {v.current_driver ? (
                           <button
                             onClick={() => onUnassignDriver(v)}
