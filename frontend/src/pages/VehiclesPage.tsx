@@ -169,8 +169,8 @@ export const VehiclesPage: React.FC = () => {
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="relative w-full md:w-80">
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative w-full sm:w-72 lg:w-80">
           <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
           <input
             type="text"
@@ -184,7 +184,7 @@ export const VehiclesPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div className="grid grid-cols-2 sm:flex items-center gap-2.5 w-full sm:w-auto">
           {/* Status filter */}
           <select
             value={statusFilter}
@@ -192,7 +192,7 @@ export const VehiclesPage: React.FC = () => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">ACTIVE</option>
@@ -208,7 +208,7 @@ export const VehiclesPage: React.FC = () => {
               setTypeFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Types</option>
             <option value="TRUCK">TRUCK</option>
@@ -217,8 +217,8 @@ export const VehiclesPage: React.FC = () => {
             <option value="MOTORCYCLE">MOTORCYCLE</option>
           </select>
 
-          <span className="text-xs text-slate-500 font-mono hidden sm:inline-block">
-            {totalCount} total vehicles
+          <span className="col-span-2 text-center sm:text-left text-xs text-slate-500 font-mono sm:inline-block">
+            {totalCount} total
           </span>
         </div>
       </div>
@@ -235,7 +235,7 @@ export const VehiclesPage: React.FC = () => {
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
           <p className="text-xs text-slate-500">
             Page {page} of {totalPages} ({totalCount} total vehicles)
           </p>
@@ -243,14 +243,14 @@ export const VehiclesPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Next
             </button>

@@ -70,18 +70,18 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4">
+    <div className="flex flex-col justify-center items-center py-6 px-4">
       <div className="max-w-md w-full space-y-6">
         {/* Brand & Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 mb-2">
+          <div className="inline-flex p-3 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-2">
             <Truck className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
             Logistics Command Center
           </h1>
-          <p className="text-sm text-slate-400">
-            Sprint 1: Secure RBAC Authentication & Session Management
+          <p className="text-xs sm:text-sm text-slate-400">
+            Enterprise Real-Time Telemetry & Dispatch Portal
           </p>
         </div>
 
