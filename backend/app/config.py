@@ -44,10 +44,27 @@ class Settings(BaseSettings):
                 v = v.replace("postgres://", "postgresql+asyncpg://", 1)
             elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
-            # asyncpg expects 'ssl', not 'sslmode' (Neon defaults to ?sslmode=require)
-            if "sslmode=" in v:
-                v = v.replace("sslmode=", "ssl=")
-            return v
+
+            # Clean query parameters for asyncpg compatibility:
+            # Neon/libpq strings often include ?sslmode=require&channel_binding=prefer etc.
+            # asyncpg only supports 'ssl', not 'sslmode' or 'channel_binding'.
+            import urllib.parse
+            parsed = urllib.parse.urlsplit(v)
+            query_params = urllib.parse.parse_qs(parsed.query)
+
+            clean_query: dict[str, str] = {}
+            if "sslmode" in query_params or "ssl" in query_params:
+                clean_query["ssl"] = "require"
+
+            return urllib.parse.urlunsplit(
+                (
+                    parsed.scheme,
+                    parsed.netloc,
+                    parsed.path,
+                    urllib.parse.urlencode(clean_query),
+                    parsed.fragment,
+                )
+            )
         data = values.data
         return str(
             PostgresDsn.build(
