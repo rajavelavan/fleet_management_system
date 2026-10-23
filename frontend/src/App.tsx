@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
   BarChart3,
@@ -24,6 +24,7 @@ import {
 import { fetchHealthStatus, HealthCheckResponse, API_BASE_URL } from "./api/client";
 import { AdminRoute } from "./components/guards/AdminRoute";
 import { DriverRoute } from "./components/guards/DriverRoute";
+import { ProtectedRoute } from "./components/guards/ProtectedRoute";
 import { AdminPage } from "./pages/AdminPage";
 import { DriverPage } from "./pages/DriverPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -60,6 +61,29 @@ export const NavigationBar: React.FC = () => {
       navigate("/login");
     }
   };
+
+  // When not signed in, center the Fleet Logistics CTA branding and omit navbar tabs and sign-in button
+  if (!isAuthenticated) {
+    return (
+      <header className="pb-5 border-b border-slate-800">
+        <div className="flex items-center justify-center">
+          <Link to="/login" className="flex items-center space-x-3 group shrink-0">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
+              <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center gap-2">
+                Fleet Logistics
+              </h1>
+              <p className="text-[11px] text-slate-400 hidden sm:block">
+                Real-Time Telemetry & Mobile Dispatch
+              </p>
+            </div>
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   const navLinks = [
     { path: "/", label: "Overview", icon: Activity },
@@ -117,28 +141,20 @@ export const NavigationBar: React.FC = () => {
 
         {/* Desktop User Session & Header Actions (lg+) */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
-          {isAuthenticated && <NotificationBell />}
-          {isAuthenticated && user ? (
+          <NotificationBell />
+          {user && (
             <UserProfileMenu
               user={user}
               role={role}
               onLogout={handleLogout}
               onOpenProfile={() => setIsProfileModalOpen(true)}
             />
-          ) : (
-            <Link
-              to="/login"
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition shadow-lg shadow-indigo-500/20"
-            >
-              <Lock className="w-4 h-4" />
-              Sign In
-            </Link>
           )}
         </div>
 
         {/* Mobile Header Controls (< lg) */}
         <div className="flex lg:hidden items-center gap-2">
-          {isAuthenticated && <NotificationBell />}
+          <NotificationBell />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition"
@@ -157,7 +173,7 @@ export const NavigationBar: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="lg:hidden mt-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* User Session Info inside Drawer */}
-          {isAuthenticated && user ? (
+          {user && (
             <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -194,15 +210,6 @@ export const NavigationBar: React.FC = () => {
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          ) : (
-            <Link
-              to="/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition"
-            >
-              <Lock className="w-4 h-4" />
-              <span>Sign In to Fleet</span>
-            </Link>
           )}
 
           {/* Navigation Links with generous touch targets (>= 44px) */}
@@ -727,11 +734,46 @@ export const App: React.FC = () => {
         <NavigationBar />
         <main className="mt-8 flex-1">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/map" element={<TrackingDashboardPage />} />
-            <Route path="/deliveries" element={<DeliveriesPage />} />
-            <Route path="/vehicles" element={<VehiclesPage />} />
-            <Route path="/drivers" element={<DriversPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <TrackingDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/deliveries"
+              element={
+                <ProtectedRoute>
+                  <DeliveriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vehicles"
+              element={
+                <ProtectedRoute>
+                  <VehiclesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/drivers"
+              element={
+                <ProtectedRoute>
+                  <DriversPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/admin"
@@ -749,6 +791,7 @@ export const App: React.FC = () => {
                 </DriverRoute>
               }
             />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </main>
 

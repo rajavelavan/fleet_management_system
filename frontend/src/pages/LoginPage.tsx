@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Lock,
@@ -7,7 +7,6 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Truck,
   ArrowRight,
   UserCheck,
 } from "lucide-react";
@@ -17,7 +16,7 @@ import { useAuthStore } from "../store/authStore";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setAuth } = useAuthStore();
+  const { isAuthenticated, setAuth } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +27,13 @@ export const LoginPage: React.FC = () => {
   // Retrieve origin route if redirected by route guard
   const fromLocation =
     (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(fromLocation, { replace: true });
+    }
+  }, [isAuthenticated, navigate, fromLocation]);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -72,17 +78,11 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="flex flex-col justify-center items-center py-6 px-4">
       <div className="max-w-md w-full space-y-6">
-        {/* Brand & Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-2">
-            <Truck className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-            Logistics Command Center
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Sign In
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            Enterprise Real-Time Telemetry & Dispatch Portal
-          </p>
         </div>
 
         {/* Login Form Card */}
@@ -159,7 +159,7 @@ export const LoginPage: React.FC = () => {
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Submit</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
