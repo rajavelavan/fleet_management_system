@@ -68,7 +68,7 @@ export const VehicleSidebar: React.FC<VehicleSidebarProps> = ({
   };
 
   return (
-    <div className="w-80 md:w-96 h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 select-none">
+    <div className="w-full lg:w-80 xl:w-96 h-full flex flex-col bg-slate-900 border-r border-slate-800 shrink-0 select-none">
       {/* Header & Connection status */}
       <div className="p-4 border-b border-slate-800/80 bg-slate-950/40">
         <div className="flex items-center justify-between mb-3">
