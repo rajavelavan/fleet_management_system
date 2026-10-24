@@ -91,7 +91,8 @@ export const DriversPage: React.FC = () => {
   const totalPages = driverData?.pages || 1;
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -219,6 +220,7 @@ export const DriversPage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
 
       {/* Driver Form Modal */}
       <DriverForm
@@ -228,6 +230,6 @@ export const DriversPage: React.FC = () => {
         onSubmit={handleFormSubmit}
         isLoading={createDriverMutation.isPending || updateDriverMutation.isPending}
       />
-    </div>
+    </>
   );
 };
