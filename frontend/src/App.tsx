@@ -291,9 +291,9 @@ export const App: React.FC = () => {
       {/* Fixed Header on all screen sizes */}
       <NavigationBar />
 
-      {/* Scrollable Main Content Area on all screen sizes */}
-      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col min-h-full">
+      {/* Fixed Main Viewport Container - Data/table contents scroll independently */}
+      <main className="flex-1 min-h-0 overflow-hidden flex flex-col">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-1 min-h-0 flex flex-col h-full overflow-hidden">
           <Routes>
             <Route
               path="/"
@@ -364,15 +364,19 @@ export const App: React.FC = () => {
             <div className="hidden md:block">
               <SystemHealthPopover placement="up" />
             </div>
-            <span className="hidden md:inline">&bull;</span>
-            <a
-              href={`${API_BASE_URL}/api/v1/docs`}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-slate-900 dark:hover:text-slate-200 transition"
-            >
-              API Docs
-            </a>
+            {role === "ADMIN" && (
+              <>
+                <span className="hidden md:inline">&bull;</span>
+                <a
+                  href={`${API_BASE_URL}/api/v1/docs`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-slate-900 dark:hover:text-slate-200 transition"
+                >
+                  API Docs
+                </a>
+              </>
+            )}
           </div>
         </div>
       </footer>

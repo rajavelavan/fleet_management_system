@@ -92,7 +92,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-center py-6 px-4 my-auto">
+    <div className="flex-1 min-h-0 w-full overflow-y-auto flex flex-col justify-center items-center py-6 px-4 my-auto">
       <div className="max-w-md w-full space-y-6">
         {/* Header */}
         <div className="text-center">
