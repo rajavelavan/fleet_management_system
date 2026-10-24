@@ -35,7 +35,6 @@ import { useThemeStore } from "./store/themeStore";
 export const NavigationBar: React.FC = () => {
   const location = useLocation();
   const { user, role, isAuthenticated, clearAuth } = useAuthStore();
-  const { mode } = useThemeStore();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -216,17 +215,6 @@ export const NavigationBar: React.FC = () => {
                 </button>
               </div>
             )}
-
-            {/* Quick Theme Switcher in Mobile Drawer */}
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                <span>Color Theme</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">
-                  {mode} mode
-                </span>
-              </div>
-              <ThemeSwitcher variant="segmented" showLabels className="w-full justify-between" />
-            </div>
 
             {/* Navigation Links with generous touch targets (>= 44px) */}
             <nav className="flex flex-col space-y-1">

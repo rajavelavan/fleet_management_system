@@ -7,7 +7,6 @@ import {
   Activity,
 } from "lucide-react";
 import { User, UserRole } from "../types/auth";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 
 interface UserProfileMenuProps {
   user: User;
@@ -145,12 +144,6 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
 
           {/* Body CTA & Actions */}
           <div className="p-2 space-y-1 bg-white dark:bg-slate-950">
-            {/* Theme switcher segmented option inside profile menu */}
-            <div className="px-2 py-1.5 flex items-center justify-between">
-              <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Theme</span>
-              <ThemeSwitcher variant="segmented" />
-            </div>
-
             {/* CTA to Visit Full Profile Details */}
             <button
               onClick={() => {

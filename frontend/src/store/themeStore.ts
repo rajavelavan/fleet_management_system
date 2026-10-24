@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-export type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = "light" | "dark";
 export type ResolvedTheme = "light" | "dark";
 
 const THEME_STORAGE_KEY = "fleet_theme_mode";
 
-const getSystemTheme = (): ResolvedTheme => {
+const getSystemTheme = (): ThemeMode => {
   if (typeof window !== "undefined" && window.matchMedia) {
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -14,30 +14,23 @@ const getSystemTheme = (): ResolvedTheme => {
   return "dark";
 };
 
-const getStoredMode = (): ThemeMode => {
-  if (typeof window === "undefined") return "system";
+const getInitialTheme = (): ThemeMode => {
+  if (typeof window === "undefined") return "dark";
   try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    if (stored === "light" || stored === "dark" || stored === "system") {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === "light" || stored === "dark") {
       return stored;
     }
   } catch {
-    // LocalStorage unavailable
+    // Storage access unavailable
   }
-  return "system";
+  return getSystemTheme();
 };
 
-const resolveTheme = (mode: ThemeMode): ResolvedTheme => {
-  if (mode === "system") {
-    return getSystemTheme();
-  }
-  return mode;
-};
-
-export const applyThemeToDom = (resolvedTheme: ResolvedTheme) => {
+export const applyThemeToDom = (theme: ThemeMode) => {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
-  if (resolvedTheme === "dark") {
+  if (theme === "dark") {
     root.classList.add("dark");
     root.classList.remove("light");
     root.setAttribute("data-theme", "dark");
@@ -51,46 +44,47 @@ export const applyThemeToDom = (resolvedTheme: ResolvedTheme) => {
 };
 
 interface ThemeState {
-  mode: ThemeMode;
-  resolvedTheme: ResolvedTheme;
-  setMode: (mode: ThemeMode) => void;
+  theme: ThemeMode;
+  mode: ThemeMode; // Alias for backward compatibility
+  resolvedTheme: ResolvedTheme; // Alias for backward compatibility
+  setTheme: (theme: ThemeMode) => void;
+  setMode: (mode: ThemeMode) => void; // Alias
   toggleTheme: () => void;
   initTheme: () => () => void;
 }
 
-const initialMode = getStoredMode();
-const initialResolved = resolveTheme(initialMode);
+const initialTheme = getInitialTheme();
 if (typeof window !== "undefined") {
-  applyThemeToDom(initialResolved);
+  applyThemeToDom(initialTheme);
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  mode: initialMode,
-  resolvedTheme: initialResolved,
+  theme: initialTheme,
+  mode: initialTheme,
+  resolvedTheme: initialTheme,
 
-  setMode: (mode: ThemeMode) => {
-    const resolved = resolveTheme(mode);
+  setTheme: (nextTheme: ThemeMode) => {
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, mode);
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     } catch {
       // Storage write error
     }
-    applyThemeToDom(resolved);
-    set({ mode, resolvedTheme: resolved });
+    applyThemeToDom(nextTheme);
+    set({
+      theme: nextTheme,
+      mode: nextTheme,
+      resolvedTheme: nextTheme,
+    });
+  },
+
+  setMode: (mode: ThemeMode) => {
+    get().setTheme(mode);
   },
 
   toggleTheme: () => {
-    const { mode, resolvedTheme } = get();
-    let nextMode: ThemeMode;
-    if (mode === "system") {
-      // If currently system, switch to opposite of resolved
-      nextMode = resolvedTheme === "dark" ? "light" : "dark";
-    } else if (mode === "dark") {
-      nextMode = "light";
-    } else {
-      nextMode = "system";
-    }
-    get().setMode(nextMode);
+    const currentTheme = get().theme;
+    const nextTheme: ThemeMode = currentTheme === "dark" ? "light" : "dark";
+    get().setTheme(nextTheme);
   },
 
   initTheme: () => {
@@ -100,19 +94,26 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const handleChange = () => {
-      const currentMode = get().mode;
-      if (currentMode === "system") {
-        const nextResolved = getSystemTheme();
-        applyThemeToDom(nextResolved);
-        set({ resolvedTheme: nextResolved });
+    const handleChange = (e: MediaQueryListEvent) => {
+      // If user has not explicitly set a manual preference in localStorage, follow system preference
+      try {
+        const stored = localStorage.getItem(THEME_STORAGE_KEY);
+        if (!stored) {
+          const sysTheme: ThemeMode = e.matches ? "dark" : "light";
+          applyThemeToDom(sysTheme);
+          set({
+            theme: sysTheme,
+            mode: sysTheme,
+            resolvedTheme: sysTheme,
+          });
+        }
+      } catch {
+        // Storage access error
       }
     };
 
     mediaQuery.addEventListener("change", handleChange);
-
-    // Apply initially
-    applyThemeToDom(get().resolvedTheme);
+    applyThemeToDom(get().theme);
 
     return () => {
       mediaQuery.removeEventListener("change", handleChange);

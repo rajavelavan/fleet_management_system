@@ -13,10 +13,8 @@ import {
   Check,
   Key,
   Activity,
-  Sliders,
 } from "lucide-react";
 import { User, UserRole } from "../types/auth";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -127,21 +125,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 rounded-xl p-3 mt-4 leading-relaxed">
             {getRoleDescription(currentRole)}
           </p>
-
-          {/* Theme & Appearance Configuration */}
-          <div className="mt-5 space-y-2">
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sliders className="w-3 h-3 text-indigo-500" />
-              Display & Theme Preference
-            </h3>
-            <div className="p-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold text-slate-900 dark:text-white">Active Theme Mode</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Choose light, dark, or automatic system match</p>
-              </div>
-              <ThemeSwitcher variant="segmented" showLabels />
-            </div>
-          </div>
 
           {/* Detailed Info Cards */}
           <div className="mt-5 space-y-3">
