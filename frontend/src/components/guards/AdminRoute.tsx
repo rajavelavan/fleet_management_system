@@ -15,6 +15,16 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // If DISPATCHER navigates to /admin, seamlessly redirect to /map
+  if (role === "DISPATCHER") {
+    return <Navigate to="/map" replace />;
+  }
+
+  // If DRIVER navigates to /admin, seamlessly redirect to /driver
+  if (role === "DRIVER") {
+    return <Navigate to="/driver" replace />;
+  }
+
   if (role !== "ADMIN") {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">

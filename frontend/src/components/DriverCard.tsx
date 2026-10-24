@@ -12,6 +12,7 @@ import {
   Mail,
 } from "lucide-react";
 import { Driver } from "../types/fleet";
+import { useAuthStore } from "../store/authStore";
 
 interface DriverCardProps {
   driver: Driver;
@@ -24,6 +25,9 @@ export const DriverCard: React.FC<DriverCardProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { role } = useAuthStore();
+  const isAdmin = role === "ADMIN";
+
   const isLicenseExpired = () => {
     if (!driver.license_expiry) return false;
     return new Date(driver.license_expiry) < new Date();
@@ -68,20 +72,24 @@ export const DriverCard: React.FC<DriverCardProps> = ({
               )}
             </span>
 
-            <button
-              onClick={() => onEdit(driver)}
-              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              title="Edit Driver Profile"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => onDelete(driver)}
-              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              title="Delete Driver"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            {isAdmin && (
+              <>
+                <button
+                  onClick={() => onEdit(driver)}
+                  className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Edit Driver Profile"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => onDelete(driver)}
+                  className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Delete Driver"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
 

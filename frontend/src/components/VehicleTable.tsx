@@ -12,6 +12,7 @@ import {
   Radio,
 } from "lucide-react";
 import { Vehicle } from "../types/fleet";
+import { useAuthStore } from "../store/authStore";
 
 interface VehicleTableProps {
   vehicles: Vehicle[];
@@ -30,6 +31,8 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
   onAssignDriver,
   onUnassignDriver,
 }) => {
+  const { role } = useAuthStore();
+  const isAdmin = role === "ADMIN";
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "ACTIVE":
@@ -218,20 +221,24 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
                     <span>Assign Driver</span>
                   </button>
                 )}
-                <button
-                  onClick={() => onEdit(v)}
-                  className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
-                  title="Edit Vehicle"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => onDelete(v)}
-                  className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition"
-                  title="Delete Vehicle"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {isAdmin && (
+                  <>
+                    <button
+                      onClick={() => onEdit(v)}
+                      className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                      title="Edit Vehicle"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => onDelete(v)}
+                      className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                      title="Delete Vehicle"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -395,20 +402,24 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
                             <UserCheck className="w-4 h-4" />
                           </button>
                         )}
-                        <button
-                          onClick={() => onEdit(v)}
-                          title="Edit Vehicle"
-                          className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => onDelete(v)}
-                          title="Delete Vehicle"
-                          className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {isAdmin && (
+                          <>
+                            <button
+                              onClick={() => onEdit(v)}
+                              title="Edit Vehicle"
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => onDelete(v)}
+                              title="Delete Vehicle"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </td>

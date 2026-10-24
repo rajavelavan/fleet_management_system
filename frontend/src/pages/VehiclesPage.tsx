@@ -19,8 +19,11 @@ import { VehicleTable } from "../components/VehicleTable";
 import { VehicleForm } from "../components/VehicleForm";
 import { AssignDriverModal } from "../components/AssignDriverModal";
 import { Vehicle, VehicleCreatePayload } from "../types/fleet";
+import { useAuthStore } from "../store/authStore";
 
 export const VehiclesPage: React.FC = () => {
+  const { role } = useAuthStore();
+  const isAdmin = role === "ADMIN";
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("");
@@ -152,13 +155,15 @@ export const VehiclesPage: React.FC = () => {
               className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-500 dark:text-indigo-400" : ""}`}
             />
           </button>
-          <button
-            onClick={handleOpenCreate}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Vehicle</span>
-          </button>
+          {isAdmin && (
+            <button
+              onClick={handleOpenCreate}
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Vehicle</span>
+            </button>
+          )}
         </div>
       </div>
 

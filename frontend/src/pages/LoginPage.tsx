@@ -28,16 +28,26 @@ export const LoginPage: React.FC = () => {
   const fromLocation =
     (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
+  const getLandingPath = (userRole: string | null | undefined, originPath: string) => {
+    if (userRole === "DRIVER") {
+      return "/driver";
+    }
+    if (userRole === "DISPATCHER") {
+      if (originPath === "/" || originPath === "/driver" || originPath === "/admin") {
+        return "/map";
+      }
+      return originPath;
+    }
+    if (originPath === "/" || originPath === "/driver") {
+      return "/map";
+    }
+    return originPath;
+  };
+
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const isDriver = role === "DRIVER";
-      const targetPath = isDriver
-        ? "/driver"
-        : fromLocation === "/" || fromLocation === "/driver"
-        ? "/map"
-        : fromLocation;
-      navigate(targetPath, { replace: true });
+      navigate(getLandingPath(role, fromLocation), { replace: true });
     }
   }, [isAuthenticated, role, navigate, fromLocation]);
 
@@ -54,13 +64,7 @@ export const LoginPage: React.FC = () => {
     try {
       const data = await authService.login({ email, password });
       setAuth(data.user, data.access_token);
-      const isDriver = data.user.role === "DRIVER";
-      const targetPath = isDriver
-        ? "/driver"
-        : fromLocation === "/" || fromLocation === "/driver"
-        ? "/map"
-        : fromLocation;
-      navigate(targetPath, { replace: true });
+      navigate(getLandingPath(data.user.role, fromLocation), { replace: true });
     } catch (err: unknown) {
       if (
         typeof err === "object" &&
