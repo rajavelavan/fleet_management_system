@@ -95,9 +95,9 @@ export const DriversPage: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="flex-1 min-h-0 flex flex-col space-y-4">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
             <Users className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
@@ -132,14 +132,14 @@ export const DriversPage: React.FC = () => {
       </div>
 
       {actionError && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center space-x-3 text-rose-400 text-sm">
+        <div className="shrink-0 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center space-x-3 text-rose-400 text-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+      <div className="shrink-0 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
@@ -174,36 +174,38 @@ export const DriversPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Drivers Grid */}
-      {isLoadingDrivers ? (
-        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 flex flex-col items-center justify-center space-y-4">
-          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Loading driver profiles...</p>
-        </div>
-      ) : drivers.length === 0 ? (
-        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center">
-          <Users className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-          <h3 className="text-lg font-medium text-slate-800 dark:text-slate-300 mb-1">No drivers found</h3>
-          <p className="text-slate-500 text-sm max-w-sm mx-auto">
-            No driver profiles match your criteria. You can register a new driver using their user ID.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {drivers.map((d) => (
-            <DriverCard
-              key={d.id}
-              driver={d}
-              onEdit={handleOpenEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      )}
+      {/* Drivers Cards Container - Scrolls if data exceeds viewport */}
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1">
+        {isLoadingDrivers ? (
+          <div className="w-full h-full min-h-[240px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 flex flex-col items-center justify-center space-y-4">
+            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Loading driver profiles...</p>
+          </div>
+        ) : drivers.length === 0 ? (
+          <div className="w-full h-full min-h-[240px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+            <Users className="w-12 h-12 text-slate-400 dark:text-slate-600 mb-3" />
+            <h3 className="text-lg font-medium text-slate-800 dark:text-slate-300 mb-1">No drivers found</h3>
+            <p className="text-slate-500 text-sm max-w-sm mx-auto">
+              No driver profiles match your criteria. You can register a new driver using their user ID.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {drivers.map((d) => (
+              <DriverCard
+                key={d.id}
+                driver={d}
+                onEdit={handleOpenEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Pagination Controls */}
+      {/* Fixed Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-2">
+        <div className="shrink-0 flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800/80">
           <p className="text-xs text-slate-500">
             Page {page} of {totalPages} ({totalCount} total drivers)
           </p>
