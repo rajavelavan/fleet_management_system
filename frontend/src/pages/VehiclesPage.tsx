@@ -127,7 +127,8 @@ export const VehiclesPage: React.FC = () => {
   const totalPages = vehicleData?.pages || 1;
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Top Banner / Metrics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -257,6 +258,7 @@ export const VehiclesPage: React.FC = () => {
           </div>
         </div>
       )}
+      </div>
 
       {/* Vehicle Create / Edit Modal */}
       <VehicleForm
@@ -276,6 +278,6 @@ export const VehiclesPage: React.FC = () => {
         drivers={driverData?.items || []}
         isLoading={assignDriverMutation.isPending}
       />
-    </div>
+    </>
   );
 };

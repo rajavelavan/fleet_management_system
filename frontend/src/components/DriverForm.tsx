@@ -89,7 +89,7 @@ export const DriverForm: React.FC<DriverFormProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/10 dark:bg-black/20 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/10 dark:bg-black/20 !m-0 overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8">
         {/* Header */}
         <div className="flex items-center justify-between pb-5 border-b border-slate-100 dark:border-slate-800">

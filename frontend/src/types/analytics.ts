@@ -44,11 +44,33 @@ export interface SystemHealthServices {
   report_generation: boolean;
 }
 
-export interface HealthCheckResponse {
+export interface BackendHealthResponse {
   status: string;
+  service?: string;
+  version?: string;
+  environment?: string;
+  components?: {
+    database?: {
+      status?: string;
+      postgis_version?: string;
+    };
+    redis?: {
+      status?: string;
+    };
+  };
+}
+
+export interface HealthCheckResponse {
+  status: "OK" | "DEGRADED" | "DOWN";
   timestamp: string;
   version: string;
   services: SystemHealthServices;
+  details?: {
+    databaseStatus?: string;
+    postgisVersion?: string;
+    redisStatus?: string;
+    environment?: string;
+  };
 }
 
 export interface DeliveriesTrendResponse {

@@ -150,7 +150,8 @@ export const DeliveriesPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Header and Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -559,6 +560,7 @@ export const DeliveriesPage: React.FC = () => {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Dispatcher Create Delivery Modal */}
       <CreateDeliveryModal
@@ -579,7 +581,7 @@ export const DeliveriesPage: React.FC = () => {
           assignDeliveryMutation.mutateAsync({ id: deliveryId, payload })
         }
       />
-    </div>
+    </>
   );
 };
 

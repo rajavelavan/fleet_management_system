@@ -1,6 +1,8 @@
 import apiClient from "../api/client";
+import { useTrackingStore } from "../store/trackingStore";
 import {
   AlertsBreakdownResponse,
+  BackendHealthResponse,
   DeliveriesTrendResponse,
   HealthCheckResponse,
   KPISummaryResponse,
@@ -9,8 +11,68 @@ import {
 
 export const analyticsService = {
   async getSystemHealth(): Promise<HealthCheckResponse> {
-    const res = await apiClient.get<HealthCheckResponse>("/api/v1/health");
-    return res.data;
+    try {
+      const res = await apiClient.get<BackendHealthResponse>("/api/v1/health");
+      const raw = res.data;
+
+      const dbHealthy =
+        raw?.components?.database?.status?.toLowerCase().includes("healthy") ?? false;
+      const redisHealthy =
+        raw?.components?.redis?.status?.toLowerCase().includes("healthy") ?? false;
+
+      // Google Routes API key check
+      const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      const googleRoutesHealthy = Boolean(
+        googleApiKey &&
+          googleApiKey.trim().length > 0 &&
+          !googleApiKey.includes("YOUR_GOOGLE_MAPS_API_KEY")
+      );
+
+      // WebSocket operational status
+      const isTrackingWsConnected = useTrackingStore.getState().isConnected;
+      const wsOperational = isTrackingWsConnected || (dbHealthy && redisHealthy);
+
+      // Excel Report Engine is available when backend is responsive
+      const reportsHealthy = dbHealthy;
+
+      const isOverallOk =
+        (raw?.status?.toLowerCase() === "ok" || (dbHealthy && redisHealthy)) &&
+        dbHealthy &&
+        redisHealthy;
+
+      return {
+        status: isOverallOk ? "OK" : "DEGRADED",
+        timestamp: new Date().toISOString(),
+        version: raw?.version || "0.1.0",
+        services: {
+          database: dbHealthy,
+          redis: redisHealthy,
+          telemetry_websocket: wsOperational,
+          google_routes_api: googleRoutesHealthy,
+          report_generation: reportsHealthy,
+        },
+        details: {
+          databaseStatus: raw?.components?.database?.status,
+          postgisVersion: raw?.components?.database?.postgis_version,
+          redisStatus: raw?.components?.redis?.status,
+          environment: raw?.environment,
+        },
+      };
+    } catch (e) {
+      console.warn("Health check query failed:", e);
+      return {
+        status: "DOWN",
+        timestamp: new Date().toISOString(),
+        version: "v0.1.0",
+        services: {
+          database: false,
+          redis: false,
+          telemetry_websocket: false,
+          google_routes_api: false,
+          report_generation: false,
+        },
+      };
+    }
   },
 
   async getKPISummary(): Promise<KPISummaryResponse> {

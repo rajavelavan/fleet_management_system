@@ -8,8 +8,8 @@
     <script>
       (function() {
         try {
-          var mode = localStorage.getItem("fleet_theme_mode") || "system";
-          var isDark = mode === "dark" || (mode === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var stored = localStorage.getItem("fleet_theme_mode");
+          var isDark = stored === "dark" || (!stored && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
           var root = document.documentElement;
           if (isDark) {
             root.classList.add("dark");
