@@ -21,6 +21,10 @@ interface VehicleTableProps {
   onDelete: (vehicle: Vehicle) => void;
   onAssignDriver: (vehicle: Vehicle) => void;
   onUnassignDriver: (vehicle: Vehicle) => void;
+  page?: number;
+  totalPages?: number;
+  totalCount?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export const VehicleTable: React.FC<VehicleTableProps> = ({
@@ -30,6 +34,10 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
   onDelete,
   onAssignDriver,
   onUnassignDriver,
+  page,
+  totalPages,
+  totalCount,
+  onPageChange,
 }) => {
   const { role } = useAuthStore();
   const isAdmin = role === "ADMIN";
@@ -63,7 +71,7 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
 
   if (isLoading) {
     return (
-      <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-8 flex flex-col items-center justify-center space-y-4">
+      <div className="w-full flex-1 min-h-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 flex flex-col items-center justify-center space-y-4">
         <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-slate-500 dark:text-slate-400 text-sm">Loading vehicles roster...</p>
       </div>
@@ -72,8 +80,8 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
 
   if (vehicles.length === 0) {
     return (
-      <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center">
-        <Car className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+      <div className="w-full flex-1 min-h-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+        <Car className="w-12 h-12 text-slate-400 dark:text-slate-600 mb-3" />
         <h3 className="text-lg font-medium text-slate-800 dark:text-slate-300 mb-1">No vehicles found</h3>
         <p className="text-slate-500 text-sm max-w-sm mx-auto">
           No vehicles match the selected criteria or none have been added yet.
@@ -83,9 +91,9 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm dark:shadow-xl">
+    <div className="w-full flex-1 min-h-0 flex flex-col overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm dark:shadow-xl">
       {/* Mobile Card List (< lg) */}
-      <div className="block lg:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+      <div className="block lg:hidden flex-1 min-h-0 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80">
         {vehicles.map((v) => {
           const fuelPct =
             v.fuel_capacity > 0
@@ -246,9 +254,10 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
       </div>
 
       {/* Desktop Table View (lg+) */}
-      <div className="hidden lg:block overflow-x-auto">
-        <table className="w-full text-left text-sm text-slate-700 dark:text-slate-300">
-          <thead className="bg-slate-50 dark:bg-slate-800/60 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+      <div className="hidden lg:flex flex-1 min-h-0 flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-700 dark:text-slate-300">
+            <thead className="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-800/95 backdrop-blur-sm text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 shadow-sm">
             <tr>
               <th scope="col" className="px-6 py-4 font-semibold">Vehicle</th>
               <th scope="col" className="px-6 py-4 font-semibold">Type</th>
@@ -428,6 +437,41 @@ export const VehicleTable: React.FC<VehicleTableProps> = ({
             })}
           </tbody>
         </table>
+        </div>
+      </div>
+
+      {/* Fixed Table Footer (Pagination & Summary) */}
+      <div className="shrink-0 px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+        <div>
+          Showing <strong className="text-slate-900 dark:text-white">{vehicles.length}</strong> of{" "}
+          <strong className="text-slate-900 dark:text-white">{totalCount ?? vehicles.length}</strong> vehicles
+          {totalPages && totalPages > 1 && (
+            <span className="ml-1 text-slate-400">
+              (Page {page ?? 1} of {totalPages})
+            </span>
+          )}
+        </div>
+        {onPageChange && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPageChange(Math.max((page ?? 1) - 1, 1))}
+              disabled={(page ?? 1) <= 1}
+              className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-white disabled:opacity-40 transition font-medium text-xs"
+            >
+              Previous
+            </button>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              {page ?? 1} / {totalPages ?? 1}
+            </span>
+            <button
+              onClick={() => onPageChange(Math.min((page ?? 1) + 1, totalPages ?? 1))}
+              disabled={(page ?? 1) >= (totalPages ?? 1)}
+              className="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-white disabled:opacity-40 transition font-medium text-xs"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
