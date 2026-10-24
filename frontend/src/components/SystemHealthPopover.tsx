@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
   CheckCircle2,
@@ -10,7 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { analyticsService } from "../services/analyticsService";
-import { HealthCheckResponse } from "../types/analytics";
+import { useTrackingStore } from "../store/trackingStore";
 
 interface SystemHealthPopoverProps {
   placement?: "up" | "down";
@@ -19,40 +20,24 @@ interface SystemHealthPopoverProps {
 export const SystemHealthPopover: React.FC<SystemHealthPopoverProps> = ({
   placement = "up",
 }) => {
-  const [health, setHealth] = useState<HealthCheckResponse | null>(null);
-  const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isWsConnected = useTrackingStore((state) => state.isConnected);
 
-  const fetchHealth = async () => {
-    setLoading(true);
-    try {
-      const data = await analyticsService.getSystemHealth();
-      setHealth(data);
-    } catch (e) {
-      console.warn("Health check query failed:", e);
-      setHealth({
-        status: "DEGRADED",
-        timestamp: new Date().toISOString(),
-        version: "v1.0.0",
-        services: {
-          database: false,
-          redis: false,
-          telemetry_websocket: false,
-          google_routes_api: false,
-          report_generation: false,
-        },
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // TanStack Query for optimized background auto-refresh & window focus revalidation
+  const {
+    data: health,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["systemHealth"],
+    queryFn: () => analyticsService.getSystemHealth(),
+    refetchInterval: 10000, // 10s live polling
+    refetchIntervalInBackground: false, // pause when tab is in background to save battery/network
+    refetchOnWindowFocus: true, // immediately refetch when user returns to this tab
+    staleTime: 5000,
+  });
 
   // Close on outside click
   useEffect(() => {
@@ -69,44 +54,57 @@ export const SystemHealthPopover: React.FC<SystemHealthPopoverProps> = ({
   }, []);
 
   const services = health?.services;
+  const isDbLive = Boolean(services?.database);
+  const isRedisLive = Boolean(services?.redis);
+  const isWsLive = Boolean(isWsConnected || services?.telemetry_websocket);
+  const isRoutesLive = Boolean(services?.google_routes_api);
+  const isReportsLive = Boolean(services?.report_generation);
+
   const allOperational =
     health?.status === "OK" &&
-    services &&
-    Object.values(services).every(Boolean);
+    isDbLive &&
+    isRedisLive &&
+    isWsLive &&
+    isRoutesLive &&
+    isReportsLive;
 
   const tools = [
     {
       id: "database",
       name: "PostgreSQL Database",
-      status: services?.database ?? false,
+      status: isDbLive,
       icon: Database,
-      desc: "Neon PostgreSQL Cloud cluster",
+      desc: health?.details?.postgisVersion
+        ? `Neon PostgreSQL (${health.details.postgisVersion.split(" ")[0]})`
+        : "Neon PostgreSQL Cloud cluster",
     },
     {
       id: "redis",
       name: "Redis Pub/Sub & Cache",
-      status: services?.redis ?? false,
+      status: isRedisLive,
       icon: Radio,
       desc: "Live stream caching & Pub/Sub",
     },
     {
       id: "telemetry_ws",
       name: "Telemetry WebSocket",
-      status: services?.telemetry_websocket ?? false,
+      status: isWsLive,
       icon: Activity,
-      desc: "FastAPI /ws/telemetry streaming",
+      desc: isWsConnected
+        ? "Live telemetry connected"
+        : "FastAPI /ws/tracking ready",
     },
     {
       id: "routes_api",
       name: "Google Routes & Matrix",
-      status: services?.google_routes_api ?? false,
+      status: isRoutesLive,
       icon: MapPin,
       desc: "Compute polyline and ETA matrix",
     },
     {
       id: "reports",
       name: "Excel Report Engine",
-      status: services?.report_generation ?? false,
+      status: isReportsLive,
       icon: FileSpreadsheet,
       desc: "OpenPyXL spreadsheet export",
     },
@@ -129,18 +127,28 @@ export const SystemHealthPopover: React.FC<SystemHealthPopoverProps> = ({
     <div
       ref={containerRef}
       className="relative inline-block"
-      onMouseEnter={() => setIsOpen(true)}
+      onMouseEnter={() => {
+        setIsOpen(true);
+        refetch();
+      }}
       onMouseLeave={() => setIsOpen(false)}
     >
       {/* Trigger Pill */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (!isOpen) refetch();
+        }}
         className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 text-[11px] font-medium transition cursor-pointer"
         title="View Live Status of All System Services"
       >
         <span
           className={`w-2 h-2 rounded-full ${
-            allOperational ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
+            isLoading && !health
+              ? "bg-amber-500 animate-pulse"
+              : allOperational
+              ? "bg-emerald-500 animate-pulse"
+              : "bg-rose-500"
           }`}
         />
         <Activity className="w-3 h-3 text-slate-500 dark:text-slate-400" />
@@ -164,24 +172,35 @@ export const SystemHealthPopover: React.FC<SystemHealthPopoverProps> = ({
               </span>
               <span
                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
-                  allOperational
+                  isLoading && !health
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                    : allOperational
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                     : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                 }`}
               >
-                {loading && !health
+                {isLoading && !health
                   ? "CONNECTING"
                   : allOperational
                   ? "ALL OPERATIONAL"
                   : "DEGRADED"}
               </span>
             </div>
-            {lastUpdated && (
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                <RefreshCw className="w-2.5 h-2.5" />
-                {lastUpdated}
-              </span>
-            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                refetch();
+              }}
+              disabled={isFetching}
+              className="text-[10px] text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 flex items-center gap-1 transition cursor-pointer"
+              title="Click to check health now"
+            >
+              <RefreshCw
+                className={`w-2.5 h-2.5 ${isFetching ? "animate-spin text-indigo-500" : ""}`}
+              />
+              <span>{isFetching ? "Checking..." : lastUpdated || "Live"}</span>
+            </button>
           </div>
 
           {/* Individual Tool Health List */}
@@ -234,7 +253,7 @@ export const SystemHealthPopover: React.FC<SystemHealthPopoverProps> = ({
           {/* Footer note */}
           <div className="pt-1 text-[10px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
             <span>FastAPI Backend Telemetry</span>
-            <span className="font-mono">{health?.version || "v1.0.0"}</span>
+            <span className="font-mono">{health?.version || "0.1.0"}</span>
           </div>
         </div>
       </div>
