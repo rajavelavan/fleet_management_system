@@ -34,6 +34,23 @@ export interface DeliveryTrendPoint {
   total: number;
 }
 
+export type DeliveriesTrendItem = DeliveryTrendPoint;
+
+export interface SystemHealthServices {
+  database: boolean;
+  redis: boolean;
+  telemetry_websocket: boolean;
+  google_routes_api: boolean;
+  report_generation: boolean;
+}
+
+export interface HealthCheckResponse {
+  status: string;
+  timestamp: string;
+  version: string;
+  services: SystemHealthServices;
+}
+
 export interface DeliveriesTrendResponse {
   days: number;
   data: DeliveryTrendPoint[];

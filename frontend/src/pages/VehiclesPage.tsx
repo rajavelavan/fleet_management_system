@@ -131,11 +131,11 @@ export const VehiclesPage: React.FC = () => {
       {/* Top Banner / Metrics */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
-            <Truck className="w-7 h-7 text-indigo-400" />
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
+            <Truck className="w-7 h-7 text-indigo-600 dark:text-indigo-400" />
             Fleet Vehicles Management
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Physical vehicle assets, live telemetry coordinates, and real-time operational status.
           </p>
         </div>
@@ -144,11 +144,11 @@ export const VehiclesPage: React.FC = () => {
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="p-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 rounded-xl transition-all"
+            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-all shadow-sm"
             title="Refresh fleet"
           >
             <RefreshCw
-              className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-400" : ""}`}
+              className={`w-4 h-4 ${isFetching ? "animate-spin text-indigo-500 dark:text-indigo-400" : ""}`}
             />
           </button>
           <button
@@ -162,16 +162,16 @@ export const VehiclesPage: React.FC = () => {
       </div>
 
       {actionError && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center space-x-3 text-rose-400 text-sm">
+        <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl flex items-center space-x-3 text-rose-700 dark:text-rose-400 text-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{actionError}</span>
         </div>
       )}
 
       {/* Filter and Search Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-sm">
         <div className="relative w-full sm:w-72 lg:w-80">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search plate, make, or model..."
@@ -180,7 +180,7 @@ export const VehiclesPage: React.FC = () => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
 
@@ -192,7 +192,7 @@ export const VehiclesPage: React.FC = () => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">ACTIVE</option>
@@ -208,7 +208,7 @@ export const VehiclesPage: React.FC = () => {
               setTypeFilter(e.target.value);
               setPage(1);
             }}
-            className="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="">All Types</option>
             <option value="TRUCK">TRUCK</option>
@@ -243,14 +243,14 @@ export const VehiclesPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Previous
             </button>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800 disabled:opacity-40 transition-colors"
+              className="px-3.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Next
             </button>

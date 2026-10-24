@@ -34,11 +34,11 @@ export const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           </div>
           <div className="pt-2">
             <Link
-              to="/"
+              to="/map"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-medium transition border border-slate-700"
             >
               <ArrowLeft className="w-4 h-4" />
-              Return to Dashboard
+              Return to Live Map
             </Link>
           </div>
         </div>

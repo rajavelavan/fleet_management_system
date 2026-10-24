@@ -9,10 +9,11 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { DeliveryTrendPoint } from "../../types/analytics";
+import { DeliveriesTrendItem } from "../../types/analytics";
+import { useThemeStore } from "../../store/themeStore";
 
 interface DeliveryTrendChartProps {
-  data: DeliveryTrendPoint[];
+  data: DeliveriesTrendItem[];
   loading: boolean;
   days: number;
   onDaysChange: (days: number) => void;
@@ -24,29 +25,32 @@ export const DeliveryTrendChart: React.FC<DeliveryTrendChartProps> = ({
   days,
   onDaysChange,
 }) => {
+  const { resolvedTheme } = useThemeStore();
+  const isDark = resolvedTheme === "dark";
+
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm dark:shadow-xl space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-white">Delivery Volume Trends</h3>
-          <p className="text-xs text-slate-400">
-            Historical daily shipment completions, failures, and throughput
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">Delivery Volume & Fulfillment Trend</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Total dispatched vs completed orders across past timeframe
           </p>
         </div>
 
-        {/* Days Filter Pills */}
-        <div className="flex items-center space-x-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
+        {/* Days timeframe buttons */}
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
           {[7, 14, 30].map((d) => (
             <button
               key={d}
               onClick={() => onDaysChange(d)}
-              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition ${
                 days === d
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
-              {d} Days
+              {d}d
             </button>
           ))}
         </div>
@@ -54,11 +58,11 @@ export const DeliveryTrendChart: React.FC<DeliveryTrendChartProps> = ({
 
       <div className="h-72 w-full pt-4">
         {loading ? (
-          <div className="h-full w-full flex items-center justify-center text-xs text-slate-500 animate-pulse">
+          <div className="h-full w-full flex items-center justify-center text-xs text-slate-400 animate-pulse">
             Loading trend metrics...
           </div>
         ) : data.length === 0 ? (
-          <div className="h-full w-full flex items-center justify-center text-xs text-slate-500">
+          <div className="h-full w-full flex items-center justify-center text-xs text-slate-400">
             No delivery records in this timeframe.
           </div>
         ) : (
@@ -78,10 +82,10 @@ export const DeliveryTrendChart: React.FC<DeliveryTrendChartProps> = ({
                   <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#1e293b" : "#e2e8f0"} vertical={false} />
               <XAxis
                 dataKey="date"
-                stroke="#64748b"
+                stroke={isDark ? "#64748b" : "#94a3b8"}
                 tick={{ fontSize: 11 }}
                 tickFormatter={(val) => {
                   try {
@@ -92,14 +96,17 @@ export const DeliveryTrendChart: React.FC<DeliveryTrendChartProps> = ({
                   }
                 }}
               />
-              <YAxis stroke="#64748b" tick={{ fontSize: 11 }} allowDecimals={false} />
+              <YAxis stroke={isDark ? "#64748b" : "#94a3b8"} tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#0f172a",
-                  borderColor: "#334155",
+                  backgroundColor: isDark ? "#0f172a" : "#ffffff",
+                  borderColor: isDark ? "#334155" : "#e2e8f0",
                   borderRadius: "0.75rem",
                   fontSize: "12px",
-                  color: "#f8fafc",
+                  color: isDark ? "#f8fafc" : "#0f172a",
+                  boxShadow: isDark
+                    ? "0 10px 15px -3px rgba(0, 0, 0, 0.5)"
+                    : "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                 }}
               />
               <Legend
@@ -128,7 +135,7 @@ export const DeliveryTrendChart: React.FC<DeliveryTrendChartProps> = ({
               <Area
                 type="monotone"
                 dataKey="failed"
-                name="Failed"
+                name="Failed / Rejected"
                 stroke="#ef4444"
                 strokeWidth={2}
                 fillOpacity={1}

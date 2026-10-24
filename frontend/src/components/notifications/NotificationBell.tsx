@@ -1,30 +1,41 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Bell,
-  CheckCheck,
   AlertTriangle,
   AlertCircle,
   Info,
+  CheckCheck,
 } from "lucide-react";
 import { useAlertStore } from "../../store/alertStore";
 
 export const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { alerts, stats, markAsRead, markAllAsRead, fetchAlerts, fetchStats } =
-    useAlertStore();
+
+  const {
+    alerts,
+    stats,
+    fetchAlerts,
+    fetchStats,
+    markAsRead,
+    markAllAsRead,
+  } = useAlertStore();
 
   useEffect(() => {
     fetchAlerts();
     fetchStats();
+    const interval = setInterval(() => {
+      fetchAlerts();
+      fetchStats();
+    }, 15000);
+    return () => clearInterval(interval);
   }, [fetchAlerts, fetchStats]);
 
-  // Click outside listener
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -39,7 +50,7 @@ export const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
+        className="relative p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition"
         title="Fleet Alerts"
       >
         <Bell className="w-5 h-5" />
@@ -51,13 +62,13 @@ export const NotificationBell: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl z-50 overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl dark:shadow-2xl z-50 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/60">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-white">Alerts</span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">Alerts</span>
               {unreadCount > 0 && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30">
                   {unreadCount} unread
                 </span>
               )}
@@ -66,7 +77,7 @@ export const NotificationBell: React.FC = () => {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllAsRead()}
-                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium transition"
+                className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 font-medium transition"
               >
                 <CheckCheck className="w-3.5 h-3.5" />
                 Mark all read
@@ -75,7 +86,7 @@ export const NotificationBell: React.FC = () => {
           </div>
 
           {/* Alert List */}
-          <div className="max-h-96 overflow-y-auto divide-y divide-slate-800/60">
+          <div className="max-h-96 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
             {alerts.length === 0 ? (
               <div className="py-8 text-center text-xs text-slate-500">
                 No recent fleet alerts
@@ -93,27 +104,27 @@ export const NotificationBell: React.FC = () => {
                         markAsRead(alert.id);
                       }
                     }}
-                    className={`p-3.5 flex items-start gap-3 transition cursor-pointer hover:bg-slate-900/80 ${
-                      !alert.is_read ? "bg-slate-900/40" : "opacity-75"
+                    className={`p-3.5 flex items-start gap-3 transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/80 ${
+                      !alert.is_read ? "bg-indigo-50/50 dark:bg-slate-900/40" : "opacity-75"
                     }`}
                   >
                     <div className="shrink-0 mt-0.5">
                       {isCrit ? (
-                        <AlertCircle className="w-4 h-4 text-rose-400" />
+                        <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400" />
                       ) : isWarn ? (
-                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                        <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                       ) : (
-                        <Info className="w-4 h-4 text-indigo-400" />
+                        <Info className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       )}
                     </div>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold text-slate-200 truncate">
+                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                           {alert.plate_number ? `${alert.plate_number} • ` : ""}
                           {alert.alert_type.replace("_", " ")}
                         </span>
-                        <span className="text-[10px] text-slate-500 shrink-0">
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 shrink-0">
                           {new Date(alert.triggered_at).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -121,14 +132,14 @@ export const NotificationBell: React.FC = () => {
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                         {alert.message}
                       </p>
 
                       {!alert.is_read && (
                         <div className="flex items-center gap-1 mt-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                          <span className="text-[10px] text-indigo-400 font-medium">
+                          <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">
                             New
                           </span>
                         </div>
