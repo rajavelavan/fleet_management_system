@@ -189,7 +189,7 @@ export const LoginPage: React.FC = () => {
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
             <div className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
               <UserCheck className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
-              <span>Sprint 1 Test Personas (Quick-Fill):</span>
+              <span>Development purpose(Quick-Fill) click any of below to fill the creds automatically:</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -224,23 +224,6 @@ export const LoginPage: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Security Specs Callout */}
-        <div className="bg-white/60 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl p-4 text-xs text-slate-500 dark:text-slate-400 space-y-1.5 shadow-sm">
-          <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-            <span>Sprint 1 Security Pipeline</span>
-          </div>
-          <p>
-            &bull; Access Token: 15-minute Bearer JWT (In-Memory/AuthStore)
-          </p>
-          <p>
-            &bull; Refresh Token: 7-day HttpOnly, SameSite Lax Cookie
-          </p>
-          <p>
-            &bull; Password Hashing: Direct bcrypt (Python 3.12+ safe)
-          </p>
         </div>
       </div>
     </div>
