@@ -16,7 +16,7 @@ import { useAuthStore } from "../store/authStore";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, setAuth } = useAuthStore();
+  const { isAuthenticated, role, setAuth } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,9 +31,15 @@ export const LoginPage: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(fromLocation, { replace: true });
+      const isDriver = role === "DRIVER";
+      const targetPath = isDriver
+        ? "/driver"
+        : fromLocation === "/" || fromLocation === "/driver"
+        ? "/map"
+        : fromLocation;
+      navigate(targetPath, { replace: true });
     }
-  }, [isAuthenticated, navigate, fromLocation]);
+  }, [isAuthenticated, role, navigate, fromLocation]);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -48,7 +54,13 @@ export const LoginPage: React.FC = () => {
     try {
       const data = await authService.login({ email, password });
       setAuth(data.user, data.access_token);
-      navigate(fromLocation, { replace: true });
+      const isDriver = data.user.role === "DRIVER";
+      const targetPath = isDriver
+        ? "/driver"
+        : fromLocation === "/" || fromLocation === "/driver"
+        ? "/map"
+        : fromLocation;
+      navigate(targetPath, { replace: true });
     } catch (err: unknown) {
       if (
         typeof err === "object" &&

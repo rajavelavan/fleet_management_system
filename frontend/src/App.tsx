@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { API_BASE_URL } from "./api/client";
 import { AdminRoute } from "./components/guards/AdminRoute";
+import { DispatcherRoute } from "./components/guards/DispatcherRoute";
 import { DriverRoute } from "./components/guards/DriverRoute";
-import { ProtectedRoute } from "./components/guards/ProtectedRoute";
 import { AdminPage } from "./pages/AdminPage";
 import { DriverPage } from "./pages/DriverPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -83,12 +83,18 @@ export const NavigationBar: React.FC = () => {
     );
   }
 
+  const homePath = role === "DRIVER" ? "/driver" : "/map";
+
   const navLinks = [
-    { path: "/map", label: "Live Map", icon: Radio },
-    { path: "/deliveries", label: "Deliveries", icon: Package },
-    { path: "/vehicles", label: "Vehicles", icon: Truck },
-    { path: "/drivers", label: "Drivers", icon: Users },
-    ...(role === "DRIVER" || role === "ADMIN" || role === "DISPATCHER"
+    ...(role === "ADMIN" || role === "DISPATCHER"
+      ? [
+          { path: "/map", label: "Live Map", icon: Radio },
+          { path: "/deliveries", label: "Deliveries", icon: Package },
+          { path: "/vehicles", label: "Vehicles", icon: Truck },
+          { path: "/drivers", label: "Drivers", icon: Users },
+        ]
+      : []),
+    ...(role === "DRIVER"
       ? [{ path: "/driver", label: "Driver Console", icon: NavIcon }]
       : []),
     ...(role === "ADMIN"
@@ -101,7 +107,7 @@ export const NavigationBar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5">
         <div className="flex items-center justify-between gap-4">
           {/* Brand / Logo */}
-          <Link to="/map" className="flex items-center space-x-3 group shrink-0">
+          <Link to={homePath} className="flex items-center space-x-3 group shrink-0">
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:scale-105 transition-transform">
               <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
@@ -256,7 +262,7 @@ export const NavigationBar: React.FC = () => {
 };
 
 export const App: React.FC = () => {
-  const { setAccessToken, setUser, setInitialized } = useAuthStore();
+  const { role, setAccessToken, setUser, setInitialized } = useAuthStore();
   const { initTheme } = useThemeStore();
 
   useEffect(() => {
@@ -291,38 +297,38 @@ export const App: React.FC = () => {
           <Routes>
             <Route
               path="/"
-              element={<Navigate to="/map" replace />}
+              element={<Navigate to={role === "DRIVER" ? "/driver" : "/map"} replace />}
             />
             <Route
               path="/map"
               element={
-                <ProtectedRoute>
+                <DispatcherRoute>
                   <TrackingDashboardPage />
-                </ProtectedRoute>
+                </DispatcherRoute>
               }
             />
             <Route
               path="/deliveries"
               element={
-                <ProtectedRoute>
+                <DispatcherRoute>
                   <DeliveriesPage />
-                </ProtectedRoute>
+                </DispatcherRoute>
               }
             />
             <Route
               path="/vehicles"
               element={
-                <ProtectedRoute>
+                <DispatcherRoute>
                   <VehiclesPage />
-                </ProtectedRoute>
+                </DispatcherRoute>
               }
             />
             <Route
               path="/drivers"
               element={
-                <ProtectedRoute>
+                <DispatcherRoute>
                   <DriversPage />
-                </ProtectedRoute>
+                </DispatcherRoute>
               }
             />
             <Route path="/login" element={<LoginPage />} />

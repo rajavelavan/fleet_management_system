@@ -34,15 +34,13 @@ export const DriverPage: React.FC = () => {
   // Fetch current driver's profile to find their assigned vehicle and delivery order
   const fetchDriverAndDelivery = async () => {
     try {
-      const driversRes = await fleetService.getDrivers({ size: 100 });
-      const currentDriver = driversRes.items.find(
-        (d) => d.user_id === user?.id || d.user?.email === user?.email
-      );
-
-      if (currentDriver) {
-        if (currentDriver.current_vehicle) {
+      try {
+        const currentDriver = await fleetService.getMyDriverProfile();
+        if (currentDriver?.current_vehicle) {
           setDriverVehicleId(currentDriver.current_vehicle.id);
         }
+      } catch (profileErr) {
+        console.warn("Could not load direct driver profile:", profileErr);
       }
 
       // Fetch deliveries assigned to this driver

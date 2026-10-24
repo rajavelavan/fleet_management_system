@@ -89,6 +89,11 @@ export const fleetService = {
   },
 
   // Driver Endpoints
+  async getMyDriverProfile(): Promise<Driver> {
+    const response = await apiClient.get<Driver>("/api/v1/drivers/me");
+    return response.data;
+  },
+
   async getDrivers(params?: DriverFilterParams): Promise<DriverListResponse> {
     const response = await apiClient.get<DriverListResponse>("/api/v1/drivers", {
       params,

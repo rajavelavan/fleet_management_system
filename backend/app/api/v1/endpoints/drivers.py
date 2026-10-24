@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import require_admin, require_dispatcher
+from app.api.deps import get_current_user, require_admin, require_dispatcher
 from app.database import get_db
 from app.models.driver import Driver
 from app.models.user import User, UserRole
@@ -210,6 +210,33 @@ async def create_driver(
 
     loaded = await get_driver_by_id_loaded(db, driver.id)
     return _format_driver_response(loaded or driver)
+
+
+@router.get(
+    "/me",
+    response_model=DriverResponse,
+    summary="Get Current Driver Profile",
+    description="Retrieve the authenticated driver's own profile and currently assigned vehicle.",
+)
+async def get_my_driver_profile(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> DriverResponse:
+    stmt = (
+        select(Driver)
+        .options(
+            selectinload(Driver.user),
+            selectinload(Driver.assignments).selectinload(VehicleDriverAssignment.vehicle),
+        )
+        .where(Driver.user_id == current_user.id)
+    )
+    driver = (await db.execute(stmt)).scalar_one_or_none()
+    if not driver:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No driver profile associated with the current user",
+        )
+    return _format_driver_response(driver)
 
 
 @router.get(
