@@ -151,9 +151,9 @@ export const DeliveriesPage: React.FC = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="flex-1 min-h-0 flex flex-col space-y-4">
       {/* Header and Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
             <Package className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
@@ -176,7 +176,7 @@ export const DeliveriesPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 shadow-sm">
+      <div className="shrink-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 shadow-sm">
         <form onSubmit={handleSearch} className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
           <input
@@ -226,9 +226,9 @@ export const DeliveriesPage: React.FC = () => {
       </div>
 
       {/* Deliveries Table Card */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl">
+      <div className="flex-1 min-h-0 flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl">
         {/* Mobile Card List View (< lg) */}
-        <div className="block lg:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+        <div className="block lg:hidden flex-1 min-h-0 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80">
           {loading && deliveries.length === 0 ? (
             <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs">
               <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500 dark:text-indigo-400" />
@@ -367,9 +367,10 @@ export const DeliveriesPage: React.FC = () => {
         </div>
 
         {/* Desktop Table View (lg+) */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-            <thead className="bg-slate-50 dark:bg-slate-950/70 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px]">
+        <div className="hidden lg:flex flex-1 min-h-0 flex-col overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+              <thead className="sticky top-0 z-10 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px] shadow-sm">
               <tr>
                 <th className="px-4 py-3.5">Order</th>
                 <th className="px-4 py-3.5">Status</th>
@@ -531,10 +532,11 @@ export const DeliveriesPage: React.FC = () => {
               )}
             </tbody>
           </table>
+          </div>
         </div>
 
-        {/* Pagination Footer */}
-        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+        {/* Fixed Table Footer (Pagination & Summary) */}
+        <div className="shrink-0 px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
           <div>
             Showing <strong className="text-slate-900 dark:text-white">{deliveries.length}</strong> of{" "}
             <strong className="text-slate-900 dark:text-white">{total}</strong> deliveries
