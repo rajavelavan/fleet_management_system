@@ -16,7 +16,7 @@ import { useAuthStore } from "../store/authStore";
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, setAuth } = useAuthStore();
+  const { isAuthenticated, role, setAuth } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,12 +28,28 @@ export const LoginPage: React.FC = () => {
   const fromLocation =
     (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
+  const getLandingPath = (userRole: string | null | undefined, originPath: string) => {
+    if (userRole === "DRIVER") {
+      return "/driver";
+    }
+    if (userRole === "DISPATCHER") {
+      if (originPath === "/" || originPath === "/driver" || originPath === "/admin") {
+        return "/map";
+      }
+      return originPath;
+    }
+    if (originPath === "/" || originPath === "/driver") {
+      return "/map";
+    }
+    return originPath;
+  };
+
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(fromLocation, { replace: true });
+      navigate(getLandingPath(role, fromLocation), { replace: true });
     }
-  }, [isAuthenticated, navigate, fromLocation]);
+  }, [isAuthenticated, role, navigate, fromLocation]);
 
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -48,7 +64,7 @@ export const LoginPage: React.FC = () => {
     try {
       const data = await authService.login({ email, password });
       setAuth(data.user, data.access_token);
-      navigate(fromLocation, { replace: true });
+      navigate(getLandingPath(data.user.role, fromLocation), { replace: true });
     } catch (err: unknown) {
       if (
         typeof err === "object" &&
@@ -76,7 +92,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-center py-6 px-4 my-auto">
+    <div className="flex-1 min-h-0 w-full overflow-y-auto flex flex-col justify-center items-center py-6 px-4 my-auto">
       <div className="max-w-md w-full space-y-6">
         {/* Header */}
         <div className="text-center">

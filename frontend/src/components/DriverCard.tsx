@@ -12,6 +12,7 @@ import {
   Mail,
 } from "lucide-react";
 import { Driver } from "../types/fleet";
+import { useAuthStore } from "../store/authStore";
 
 interface DriverCardProps {
   driver: Driver;
@@ -24,6 +25,9 @@ export const DriverCard: React.FC<DriverCardProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { role } = useAuthStore();
+  const isAdmin = role === "ADMIN";
+
   const isLicenseExpired = () => {
     if (!driver.license_expiry) return false;
     return new Date(driver.license_expiry) < new Date();
@@ -33,25 +37,26 @@ export const DriverCard: React.FC<DriverCardProps> = ({
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm dark:shadow-lg hover:border-slate-300 dark:hover:border-slate-700 transition-all group flex flex-col justify-between">
       <div>
         {/* Header with avatar, status, and actions */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center space-x-3 min-w-0">
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform shrink-0">
               <User className="w-6 h-6" />
             </div>
-            <div>
-              <h4 className="font-bold text-slate-900 dark:text-white text-base leading-tight">
+            <div className="min-w-0">
+              <h4 className="font-bold text-slate-900 dark:text-white text-base leading-tight truncate">
                 {driver.user?.email ? driver.user.email.split("@")[0] : "Driver"}
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
-                <Mail className="w-3 h-3 text-slate-400" />
-                {driver.user?.email || "No email linked"}
+              <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5 truncate">
+                <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                <span className="truncate">{driver.user?.email || "No email linked"}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-1.5">
+          {/* Right column: Status badge on top, Edit & Delete icons underneath */}
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
             <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                 driver.is_active
                   ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
                   : "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20"
@@ -68,20 +73,24 @@ export const DriverCard: React.FC<DriverCardProps> = ({
               )}
             </span>
 
-            <button
-              onClick={() => onEdit(driver)}
-              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              title="Edit Driver Profile"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => onDelete(driver)}
-              className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              title="Delete Driver"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            {isAdmin && (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onEdit(driver)}
+                  className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Edit Driver Profile"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => onDelete(driver)}
+                  className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Delete Driver"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

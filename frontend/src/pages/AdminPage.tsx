@@ -83,9 +83,9 @@ export const AdminPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="flex-1 min-h-0 flex flex-col space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-5 gap-4">
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
         <div className="flex items-center gap-3">
           <Link
             to="/map"
@@ -125,6 +125,9 @@ export const AdminPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Analytics Data & Cards Container - Scrolls when exceeding viewport */}
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-6">
 
       {/* Live KPI Summary Cards */}
       <section className="space-y-3">
@@ -257,6 +260,7 @@ export const AdminPage: React.FC = () => {
             Hourly offline vehicle watchdog (15m threshold) and midnight daily summary digests.
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

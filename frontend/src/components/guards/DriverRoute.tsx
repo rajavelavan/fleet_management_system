@@ -15,6 +15,11 @@ export const DriverRoute: React.FC<DriverRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // If a DISPATCHER navigates to /driver, seamlessly redirect to /map
+  if (role === "DISPATCHER") {
+    return <Navigate to="/map" replace />;
+  }
+
   // Allow DRIVER and ADMIN
   if (role !== "DRIVER" && role !== "ADMIN") {
     return (

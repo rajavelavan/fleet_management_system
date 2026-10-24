@@ -166,7 +166,7 @@ export const TrackingDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full flex-1 min-h-[480px] flex overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl dark:shadow-2xl transition-colors">
+    <div className="relative w-full flex-1 min-h-0 h-full flex overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-xl dark:shadow-2xl transition-colors">
       {/* Left Sidebar: Vehicle Status List */}
       <div
         className={`${

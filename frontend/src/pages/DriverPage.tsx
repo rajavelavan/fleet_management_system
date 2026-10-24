@@ -34,15 +34,13 @@ export const DriverPage: React.FC = () => {
   // Fetch current driver's profile to find their assigned vehicle and delivery order
   const fetchDriverAndDelivery = async () => {
     try {
-      const driversRes = await fleetService.getDrivers({ size: 100 });
-      const currentDriver = driversRes.items.find(
-        (d) => d.user_id === user?.id || d.user?.email === user?.email
-      );
-
-      if (currentDriver) {
-        if (currentDriver.current_vehicle) {
+      try {
+        const currentDriver = await fleetService.getMyDriverProfile();
+        if (currentDriver?.current_vehicle) {
           setDriverVehicleId(currentDriver.current_vehicle.id);
         }
+      } catch (profileErr) {
+        console.warn("Could not load direct driver profile:", profileErr);
       }
 
       // Fetch deliveries assigned to this driver
@@ -164,9 +162,9 @@ export const DriverPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col space-y-4 flex-1 min-h-[500px]">
+    <div className="flex flex-col space-y-3 flex-1 min-h-0 overflow-hidden">
       {/* Mobile Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:px-4 sm:py-3 shadow-md gap-3">
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:px-4 sm:py-3 shadow-md gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             to="/map"
@@ -230,9 +228,9 @@ export const DriverPage: React.FC = () => {
       </div>
 
       {/* Main Responsive Grid: Map + Driver Telemetry Dashboard */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-4">
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-4 overflow-hidden">
         {/* Dedicated Mobile / Driver Map View with Polyline */}
-        <div className="relative w-full h-72 sm:h-96 lg:h-auto lg:flex-1 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-xl min-h-[280px]">
+        <div className="relative w-full h-72 sm:h-80 lg:h-auto lg:flex-1 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-xl shrink-0 lg:shrink min-h-[220px]">
           <LiveGoogleMap
             vehicles={[myVehicle]}
             selectedVehicleId={myVehicle.id}
@@ -286,7 +284,7 @@ export const DriverPage: React.FC = () => {
         </div>
 
         {/* Mobile-Friendly Telemetry & Trip Controls Sheet */}
-        <div className="w-full lg:w-96 shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shadow-xl space-y-4">
+        <div className="w-full lg:w-96 flex-1 lg:flex-initial lg:h-full shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between overflow-y-auto shadow-xl space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <div className="flex items-center gap-2">
